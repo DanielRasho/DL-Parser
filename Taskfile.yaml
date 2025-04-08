@@ -1,0 +1,43 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the Go project
+    cmds:
+      - go build -o bin/main ./cmd/LexerGenerator/LexerGenerator.go
+
+  run:
+    desc: Run the lexer generator
+    deps: [build]
+    cmds:
+      - ./bin/main -f "{{.INPUTFILE}}" -o "{{.OUTPUTPATH}}"
+    vars:
+      INPUTFILE: "{{.INPUTFILE}}"
+      OUTPUTPATH: "{{.OUTPUTPATH}}"
+
+  testLex:
+    desc: Run the Go project with input file and output path
+    deps: [build]
+    cmds:
+      - ./bin/main -f "{{.YALEX}}" -o ./cmd/Lexer/lexer.go
+      - go run ./cmd/Lexer/*
+    vars:
+      YALEX: "{{.YALEX}}"
+
+  clean:
+    desc: Clean the build artifacts
+    cmds:
+      - rm -rf bin/
+      - go clean -cache -modcache -testcache -i
+
+  test:
+    desc: Run tests, optionally filtering by pattern
+    cmds:
+      - |
+        if [ -n "{{.PATTERN}}" ]; then
+          go test -v -run "{{.PATTERN}}" ./...
+        else
+          go test -v ./...
+        fi
+    vars:
+      PATTERN: "{{.PATTERN | default \"\"}}"
