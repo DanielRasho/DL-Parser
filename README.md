@@ -5,6 +5,12 @@ Hi! This project aims to be an educational implementation of a **Lexer Generator
 
 It uses a **Deterministic Finite Automata(DFA)** for Regex Patterns recognition. Down below, there will be more explanation about the actual pipeline the inputs suffer in order to recognize tokens.
 
+Tareas: 
+- Identifiar bugs -> Andre
+- Arreglar bugs del automata writer -> Andre
+- Yapar reader -> Andre
+- First Follow -> Rayo
+
 ## Getting Started 🎬
 
 ```bash
