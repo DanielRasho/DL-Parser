@@ -5,8 +5,8 @@ package Lex_writer
 import (
 	"testing"
 
-	dfa "github.com/DanielRasho/Lexer/internal/DFA"
-	yalexDef "github.com/DanielRasho/Lexer/internal/Generator/YALexReader"
+	dfa "github.com/DanielRasho/Parser/internal/Lexer/DFA"
+	yalexDef "github.com/DanielRasho/Parser/internal/Lexer/Generator/YALexReader"
 )
 
 // Se inicializa la tabla y se revisa si el mapa tiene un estado y verificar si ese estado es final

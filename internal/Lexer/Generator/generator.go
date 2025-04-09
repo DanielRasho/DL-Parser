@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strconv"
 
-	dfa "github.com/DanielRasho/Lexer/internal/DFA"
-	balancer "github.com/DanielRasho/Lexer/internal/DFA/Balancer"
-	postfix "github.com/DanielRasho/Lexer/internal/DFA/Postfix"
-	Lex_writer "github.com/DanielRasho/Lexer/internal/Generator/LexWriter"
-	yalex_reader "github.com/DanielRasho/Lexer/internal/Generator/YALexReader"
+	dfa "github.com/DanielRasho/Parser/internal/Lexer/DFA"
+	balancer "github.com/DanielRasho/Parser/internal/Lexer/DFA/Balancer"
+	postfix "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
+	Lex_writer "github.com/DanielRasho/Parser/internal/Lexer/Generator/LexWriter"
+	yalex_reader "github.com/DanielRasho/Parser/internal/Lexer/Generator/YALexReader"
 )
 
 // Given a file to read and a output path, writes a lexer definition to the desired path.

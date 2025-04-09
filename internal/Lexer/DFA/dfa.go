@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	postfix "github.com/DanielRasho/Lexer/internal/DFA/Postfix"
+	postfix "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
 )
 
 // Generates a Deterministic finite automate for language recogniation based on sequence of raw symbols

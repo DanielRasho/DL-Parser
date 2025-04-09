@@ -1,6 +1,6 @@
 package dfa
 
-import postfix "github.com/DanielRasho/Lexer/internal/DFA/Postfix"
+import postfix "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
 
 /*
 BuildAST construye un AST a partir de una lista de símbolos en notación postfix.

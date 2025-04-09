@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/template"
 
-	dfa "github.com/DanielRasho/Lexer/internal/DFA"
-	yalexDef "github.com/DanielRasho/Lexer/internal/Generator/YALexReader"
-	io "github.com/DanielRasho/Lexer/internal/IO"
+	io "github.com/DanielRasho/Parser/internal/IO"
+	dfa "github.com/DanielRasho/Parser/internal/Lexer/DFA"
+	yalexDef "github.com/DanielRasho/Parser/internal/Lexer/Generator/YALexReader"
 )
 
 // Creates function to convert into string an ADF in order to fill the LexTemplate.go

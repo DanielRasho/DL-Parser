@@ -3,7 +3,7 @@ package yalex_reader
 import (
 	"strings"
 
-	io "github.com/DanielRasho/Lexer/internal/IO"
+	io "github.com/DanielRasho/Parser/internal/IO"
 )
 
 func Parse(filePath string) (*YALexDefinition, error) {

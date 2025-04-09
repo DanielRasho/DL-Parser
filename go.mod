@@ -1,4 +1,4 @@
-module github.com/DanielRasho/Lexer
+module github.com/DanielRasho/Parser
 
 go 1.23.6
 

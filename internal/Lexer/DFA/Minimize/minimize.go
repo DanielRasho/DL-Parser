@@ -3,7 +3,7 @@ package minimize
 import (
 	"strconv"
 
-	dfa "github.com/DanielRasho/Lexer/internal/DFA"
+	dfa "github.com/DanielRasho/Parser/internal/Lexer/DFA"
 )
 
 // Al momento de conseguir un pdf se pasa todos los valores a una tabla donde tenemos:

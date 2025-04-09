@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	generator "github.com/DanielRasho/Lexer/internal/Generator"
+	generator "github.com/DanielRasho/Parser/internal/Lexer/Generator"
 )
 
 func main() {
