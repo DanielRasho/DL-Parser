@@ -2,8 +2,9 @@ package reader
 
 // Its a programatically representation of a yapar file.
 type ParserDefinition struct {
-	Tokens      []ParserSymbol
-	Productions []ParserProduction
+	NonTerminals []ParserSymbol
+	Tokens       []ParserSymbol
+	Productions  []ParserProduction
 }
 
 // Represents a single production declaration
