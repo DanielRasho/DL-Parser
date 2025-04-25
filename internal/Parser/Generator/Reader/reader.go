@@ -2,23 +2,24 @@ package reader
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"strings"
 
 	io "github.com/DanielRasho/Parser/internal/IO"
+	Parser "github.com/DanielRasho/Parser/internal/Parser"
 )
 
 // TODO: Lo que tienes que implementar andre
-func Parse(filePath string) (*ParserDefinition, error) {
+func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 	var line string
 	var token []string
-	var Tokens []ParserSymbol
-	var Productions *ParserProduction = new(ParserProduction)
-	var arrProductions []ParserProduction
+	var Tokens []Parser.ParserSymbol
+	var Productions *Parser.ParserProduction = new(Parser.ParserProduction)
+	var arrProductions []Parser.ParserProduction
+	var nonterminals []Parser.ParserSymbol
 	var is_product = false
 	var head string
+	var err error
 
 	filereader, _ := io.ReadFile(filePath)
 	for filereader.NextLine(&line) {
@@ -29,7 +30,7 @@ func Parse(filePath string) (*ParserDefinition, error) {
 			token = strings.Split(token[1], " ")
 			for i := 1; i < len(token); i++ {
 				token[i] = strings.TrimSpace(token[i])
-				Tokens = append(Tokens, ParserSymbol{Id: len(Tokens), Value: token[i]})
+				Tokens = append(Tokens, Parser.ParserSymbol{Id: len(Tokens), Value: token[i]})
 			}
 
 		}
@@ -47,7 +48,7 @@ func Parse(filePath string) (*ParserDefinition, error) {
 
 							arrProductions = append(arrProductions, *Productions)
 							samehead := Productions.Head
-							Productions = &ParserProduction{Head: samehead}
+							Productions = &Parser.ParserProduction{Head: samehead}
 
 							// fmt.Println("array", Productions.Body)
 
@@ -64,7 +65,7 @@ func Parse(filePath string) (*ParserDefinition, error) {
 					} else {
 						arrProductions = append(arrProductions, *Productions)
 						// fmt.Println("array2", arrProductions)
-						Productions = new(ParserProduction)
+						Productions = new(Parser.ParserProduction)
 						head = ""
 					}
 
@@ -81,8 +82,7 @@ func Parse(filePath string) (*ParserDefinition, error) {
 					Productions.Head = Tokens[index_val]
 
 				} else {
-					err := errors.New("NO TOKEN FOUND EXITING PROGRAM")
-					log.Fatal(err)
+					err = errors.New("NO TOKEN FOUND EXITING PROGRAM")
 				}
 			}
 
@@ -93,16 +93,21 @@ func Parse(filePath string) (*ParserDefinition, error) {
 		}
 
 	}
+	for i := range len(Tokens) {
+		if Tokens[i].Id == -1 {
+			nonterminals = append(nonterminals, Tokens[i])
+		}
+	}
 
-	fmt.Println(Tokens)
-	fmt.Println(" PRODUCCIONES")
-	fmt.Println(arrProductions)
-
-	return nil, nil
+	return &Parser.ParserDefinition{
+		NonTerminals: nonterminals,
+		Tokens:       Tokens,
+		Productions:  arrProductions,
+	}, err
 }
 
 // FINDS THE INDEX VALUE OF THE ARRAY OF PARSE SYMBOLS
-func findIndex(tokens []ParserSymbol, target string) int {
+func findIndex(tokens []Parser.ParserSymbol, target string) int {
 	for i, token := range tokens {
 		if token.Value == target {
 			return i
