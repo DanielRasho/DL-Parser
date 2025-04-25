@@ -1,4 +1,4 @@
-package reader
+package parser
 
 // Its a programatically representation of a yapar file.
 type ParserDefinition struct {
