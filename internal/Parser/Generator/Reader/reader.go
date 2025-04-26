@@ -1,7 +1,6 @@
 package reader
 
 import (
-	"errors"
 	"strings"
 
 	io "github.com/DanielRasho/Parser/internal/IO"
@@ -60,12 +59,22 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 						for i := range len(token) {
 							index_val := findIndex(Tokens, token[i])
-							Productions.Body = append(Productions.Body, Tokens[index_val])
+							if index_val == -1 {
+
+								index_valnon := findIndex(nonterminals, token[i])
+								if index_valnon == -1 {
+									nonterminals = append(nonterminals, Parser.ParserSymbol{Id: -1, Value: token[i]})
+									index_valnon = findIndex(nonterminals, token[i])
+								}
+								Productions.Body = append(Productions.Body, nonterminals[index_valnon])
+							} else {
+								Productions.Body = append(Productions.Body, Tokens[index_val])
+							}
+
 						}
 					} else {
 						arrProductions = append(arrProductions, *Productions)
 						// fmt.Println("array2", arrProductions)
-						Productions = new(Parser.ParserProduction)
 						head = ""
 					}
 
@@ -77,12 +86,10 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 			if strings.Contains(line, ":") {
 				head = strings.Split(line, ":")[0]
 				index_val := findIndex(Tokens, head)
-				if index_val != -1 {
-					Tokens[index_val].Id = -1
-					Productions.Head = Tokens[index_val]
+				if index_val == -1 {
 
-				} else {
-					err = errors.New("NO TOKEN FOUND EXITING PROGRAM")
+					Productions = new(Parser.ParserProduction)
+					Productions.Head = Parser.ParserSymbol{Id: -1, Value: head}
 				}
 			}
 

@@ -6,7 +6,7 @@
 %token TOKEN_1
 %token TOKEN_2
 %token TOKEN_3 TOKEN_4
-%token WS production1 production2 production3
+%token WS 
 IGNORE WS
 /*FINALIZA Sección de TOKENS */
 

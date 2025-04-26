@@ -6,7 +6,7 @@
 %token NUMBER
 %token PLUS MINUS TIMES DIVIDE
 %token LPAREN RPAREN
-%token WS expr term factor
+%token WS
 IGNORE WS
 /* FINALIZA Sección de TOKENS */
 

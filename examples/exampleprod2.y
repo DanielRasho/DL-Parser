@@ -5,7 +5,7 @@
 
 %token IF ELSE THEN END
 %token IDENTIFIER
-%token WS statement condition block
+%token WS 
 IGNORE WS
 /* FINALIZA Sección de TOKENS */
 
