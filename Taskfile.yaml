@@ -41,3 +41,8 @@ tasks:
         fi
     vars:
       PATTERN: "{{.PATTERN | default \"\"}}"
+  
+  buildParser:
+    desc: Build the Go project
+    cmds:
+      - go build -o bin/parser ./cmd/FirstFollow/main.go
