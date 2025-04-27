@@ -6,7 +6,7 @@ import (
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
 
-func GetFirst(def *parser.ParserDefinition) map[string][]parser.ParserSymbol {
+func GetFirst(def *parser.ParserDefinition) map[string]parser.SymbolSet {
 
 	firstSet := make(map[string]parser.SymbolSet, len(def.NonTerminals))
 
@@ -43,7 +43,6 @@ func GetFirst(def *parser.ParserDefinition) map[string][]parser.ParserSymbol {
 		}
 	}
 
-	// 🖨️ Print the FIRST sets
 	fmt.Println("=== FIRST Sets ===")
 	for nt, set := range firstSet {
 		fmt.Printf("FIRST(%s) = { ", nt)
@@ -53,11 +52,84 @@ func GetFirst(def *parser.ParserDefinition) map[string][]parser.ParserSymbol {
 		fmt.Println("}")
 	}
 
-	return nil
+	return firstSet
 }
+
 func GetFollow(def *parser.ParserDefinition,
-	firsts map[string][]parser.ParserSymbol) map[parser.ParserSymbol]int {
-	return nil
+	firsts map[string]parser.SymbolSet) map[string]parser.SymbolSet {
+
+	followSet := make(map[string]parser.SymbolSet, len(def.NonTerminals))
+
+	// Initialize symbol set for each non terminal.
+	for _, nonTerminal := range def.NonTerminals {
+		head := nonTerminal.Value
+		if _, ok := followSet[head]; !ok {
+			followSet[head] = make(map[parser.ParserSymbol]struct{})
+		}
+	}
+
+	fmt.Printf("%v\n", def.NonTerminals[0].Value)
+	initialValue := parser.ParserSymbol{Id: 0, Value: "$"}
+
+	// Add initial symbol
+	followSet[def.NonTerminals[0].Value][initialValue] = struct{}{}
+
+	changed := true
+
+	// runtime.Breakpoint()
+
+	for changed {
+		changed = false
+		for _, prod := range def.Productions {
+			for i := 0; i < len(prod.Body); i++ {
+				symbol := prod.Body[i]
+				// If is terminal ignore it
+				if symbol.Id != parser.NON_TERMINAL_ID {
+					continue
+				}
+
+				var target parser.ParserSymbol
+
+				// If is NON-Terminal compute its follow.
+				if i+1 < len(prod.Body) {
+					target = prod.Body[i+1]
+				} else {
+					target = prod.Head
+				}
+
+				// Computing follow
+				// fmt.Printf("%v\n", target)
+
+				if target.Id == parser.NON_TERMINAL_ID {
+					// FOR NON Terminal symbols.
+					for terminal := range followSet[target.Value] {
+						if _, exists := followSet[symbol.Value][terminal]; !exists {
+							followSet[symbol.Value][terminal] = struct{}{}
+							changed = true
+						}
+					}
+
+				} else {
+					if _, exist := followSet[symbol.Value][target]; !exist {
+						followSet[symbol.Value][target] = struct{}{}
+						changed = true
+					}
+				}
+
+			}
+		}
+	}
+
+	fmt.Println("=== FOLLOW Sets ===")
+	for nt, set := range followSet {
+		fmt.Printf("FOLLOW(%s) = { ", nt)
+		for sym := range set {
+			fmt.Printf("%s ", sym.Value)
+		}
+		fmt.Println("}")
+	}
+
+	return followSet
 }
 
 func NewTable(*parser.ParserDefinition) {

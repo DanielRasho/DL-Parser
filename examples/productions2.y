@@ -13,14 +13,16 @@
 %%
 
 /* INICIA Sección de PRODUCCIONES */
-E:
-    T + E
-  | T
-;
 
 T:
     int * T
   | int
   | ( E )
+;
+
+E:
+
+    T + E
+  | T
 ;
 /* FINALIZA Sección de PRODUCCIONES

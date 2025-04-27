@@ -15,7 +15,8 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	}
 
 	// runtime.Breakpoint()
-	transitiontable.GetFirst(yalexDefinition)
+	first := transitiontable.GetFirst(yalexDefinition)
+	transitiontable.GetFollow(yalexDefinition, first)
 
 	return nil
 }
