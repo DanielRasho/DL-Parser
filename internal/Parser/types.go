@@ -33,3 +33,7 @@ type ParserSymbol struct {
 	// The string value itself of the symbol
 	Value string
 }
+
+const NON_TERMINAL_ID = -1
+
+type SymbolSet = map[ParserSymbol]struct{}
