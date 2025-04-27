@@ -14,17 +14,17 @@ IGNORE WS
 
 /* INICIA Sección de PRODUCCIONES */
 
-statement:
-    IF condition THEN block ELSE block END
-  | IF condition THEN block END
+S:
+    IF C THEN B ELSE B END
+  | IF C THEN B END
 ;
 
-condition:
+C:
     IDENTIFIER
 ;
 
-block:
-    statement
+B:
+    S
   | IDENTIFIER
 ;
 

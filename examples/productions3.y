@@ -3,27 +3,31 @@
 
 /* INICIA Sección de TOKENS */
 
-%token int
-%token +
-%token *
-%token (
-%token )
+%token ^
+%token v
+%token [
+%token ]
+%token sentence
 /*FINALIZA Sección de TOKENS */
 
 %%
 
 /* INICIA Sección de PRODUCCIONES */
 
-E:
+S:
 
-    T + E
-  | T
+    S ^ P
+  | P
 ;
 
-T:
-    int * T
-  | int
-  | ( E )
+P:
+    P v Q
+  | Q
+;
+
+Q:
+    [ S ]
+  | sentence
 ;
 
 /* FINALIZA Sección de PRODUCCIONES
