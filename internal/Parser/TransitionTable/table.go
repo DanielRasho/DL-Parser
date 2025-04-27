@@ -56,7 +56,7 @@ func GetFirst(def *parser.ParserDefinition) map[string]parser.SymbolSet {
 }
 
 func GetFollow(def *parser.ParserDefinition,
-	firsts map[string]parser.SymbolSet) map[string]parser.SymbolSet {
+	firstSet map[string]parser.SymbolSet) map[string]parser.SymbolSet {
 
 	followSet := make(map[string]parser.SymbolSet, len(def.NonTerminals))
 
@@ -68,11 +68,11 @@ func GetFollow(def *parser.ParserDefinition,
 		}
 	}
 
-	fmt.Printf("%v\n", def.NonTerminals[0].Value)
+	fmt.Printf("%v\n", def.Productions[0].Head.Value)
 	initialValue := parser.ParserSymbol{Id: 0, Value: "$"}
 
 	// Add initial symbol
-	followSet[def.NonTerminals[0].Value][initialValue] = struct{}{}
+	followSet[def.Productions[0].Head.Value][initialValue] = struct{}{}
 
 	changed := true
 
@@ -88,31 +88,31 @@ func GetFollow(def *parser.ParserDefinition,
 					continue
 				}
 
-				var target parser.ParserSymbol
-
-				// If is NON-Terminal compute its follow.
+				// If form A -> a B b
 				if i+1 < len(prod.Body) {
-					target = prod.Body[i+1]
+					target := prod.Body[i+1]
+					if target.Id == parser.NON_TERMINAL_ID {
+						// FOR NON Terminal symbols.
+						for terminal := range firstSet[target.Value] {
+							if _, exists := followSet[symbol.Value][terminal]; !exists {
+								followSet[symbol.Value][terminal] = struct{}{}
+								changed = true
+							}
+						}
+					} else {
+						if _, exist := followSet[symbol.Value][target]; !exist {
+							followSet[symbol.Value][target] = struct{}{}
+							changed = true
+						}
+					}
+					// If form A -> a B
 				} else {
-					target = prod.Head
-				}
-
-				// Computing follow
-				// fmt.Printf("%v\n", target)
-
-				if target.Id == parser.NON_TERMINAL_ID {
-					// FOR NON Terminal symbols.
+					target := prod.Head
 					for terminal := range followSet[target.Value] {
 						if _, exists := followSet[symbol.Value][terminal]; !exists {
 							followSet[symbol.Value][terminal] = struct{}{}
 							changed = true
 						}
-					}
-
-				} else {
-					if _, exist := followSet[symbol.Value][target]; !exist {
-						followSet[symbol.Value][target] = struct{}{}
-						changed = true
 					}
 				}
 
