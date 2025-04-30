@@ -108,7 +108,7 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 	return &Parser.ParserDefinition{
 		NonTerminals: nonterminals,
-		Tokens:       Tokens,
+		Terminals:    Tokens,
 		Productions:  arrProductions,
 	}, err
 }

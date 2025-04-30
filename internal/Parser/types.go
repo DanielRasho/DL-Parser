@@ -3,7 +3,7 @@ package parser
 // Its a programatically representation of a yapar file.
 type ParserDefinition struct {
 	NonTerminals []ParserSymbol
-	Tokens       []ParserSymbol
+	Terminals    []ParserSymbol
 	Productions  []ParserProduction
 }
 
@@ -28,10 +28,12 @@ type ParserProduction struct {
 type ParserSymbol struct {
 	// If token is terminal, the id comes from the order of declaration in
 	// the Yapar file.
-	// Set to -1 if symbol is NON-TERMINAL
+	// Start from 1
 	Id int
 	// The string value itself of the symbol
 	Value string
+
+	IsTerminal bool
 }
 
 const NON_TERMINAL_ID = -1
