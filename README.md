@@ -3,7 +3,7 @@
 
 Hi! This project aims to be an educational implementation of a **Lexer Generator & Parser generator** following a Lex-like and Yapar-like sintax to configure it. 
 
-It uses a **Deterministic Finite Automata(DFA)** for Regex Patterns recognition. Down below, there will be more explanation about the actual pipeline the inputs suffer in order to recognize tokens.
+It uses a **Deterministic Finite Automata(DFA)** for Regex Patterns recognition, and a **L0 Automata** for syntax recognition. Down below, there will be more explanation about the actual pipeline the inputs suffer in order to recognize tokens.
 
 ## Getting Started 🎬
 
@@ -37,3 +37,9 @@ Like lexers, parsers can share many components, making it easy to standardize th
 4. Providing a `lexer.go` (this one can also be generated) that reads the input code and pass it to the `parser.go` as a stream of tokens.
 
 ![](./pictures/parserPipeline.png)
+
+
+## Parser Architecture
+
+
+![](./pictures/parserArchitecture.png)
