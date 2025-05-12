@@ -20,6 +20,7 @@
         ID
         NUMBER
         WS
+        FUNC
     )
 %}
 

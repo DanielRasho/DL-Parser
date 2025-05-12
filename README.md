@@ -43,3 +43,16 @@ Like lexers, parsers can share many components, making it easy to standardize th
 
 
 ![](./pictures/parserArchitecture.png)
+
+What is the parser doing?
+
+1. Reads a Yapar file to recognize which tokens and productions can it recognize to either accept or not. 
+
+2.  Those tokens and productions will pass them to the generator in order to create a table to check if the input we will give is either correct or not.  
+
+    2.1 First step is to create a L0 automata which guides us from one node to another node based on the tokens production to find the finals nodes which will be used to parse. 
+
+    2.2 We also compute the first and follow in order to generate a table to reduce or go to so se if it can be accepted or not. 
+
+3. Now we introduce all componentes from the generator to a Parser template for GO in order to compile it and get a file to run it. 
+
