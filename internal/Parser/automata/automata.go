@@ -4,13 +4,31 @@ import (
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
 
+const ROOT_PRODUCTION_INDEX int = 0
+
+var ROOT_PRODUCTION = metaProductionId{originalId: ROOT_PRODUCTION_INDEX, index: 0}
+
 func NewAutomata(df *parser.ParserDefinition) *Automata {
 
 	// runtime.Breakpoint()
 	productionsDictionary := extendGrammar(df)
 	// runtime.Breakpoint()
 
-	getRootNode(productionsDictionary)
+	root := getRootNode(productionsDictionary)
+	root.print()
+
+	// queue := []*metaNode{root}
+
+	toCheck := root.getSymbolsToEvaluate(productionsDictionary)
+
+	// _, a := getProductionClosure(productionsDictionary, *toCheck[2])
+	// fmt.Println(prettyPrintMetaProductions(a))
+	// runtime.Breakpoint()
+	a := root.evaluate(toCheck[2], productionsDictionary)
+	b := root.evaluate(toCheck[3], productionsDictionary)
+
+	a.print()
+	b.print()
 
 	return nil
 }
@@ -24,6 +42,7 @@ func extendGrammar(df *parser.ParserDefinition) []*parser.ParserProduction {
 	// Inserting root production "S"
 	productions = append(productions,
 		&parser.ParserProduction{
+			Id: ROOT_PRODUCTION_INDEX,
 			Head: parser.ParserSymbol{
 				Id: -1,
 				// Empty space is a value a production would not receive
@@ -42,20 +61,54 @@ func extendGrammar(df *parser.ParserDefinition) []*parser.ParserProduction {
 	return productions
 }
 
+// Builds the root node for the SLR automata
 func getRootNode(productions []*parser.ParserProduction) *metaNode {
+	rootId := make(metaNodeId)
+	rootId[metaProductionId{originalId: 0, index: 0}] = struct{}{}
+
+	rootBody := make([]metaProduction, 0)
+
+	ids, others := getProductionClosure(productions, productions[0].Body[0])
+
+	// Build Id
+	for key := range ids {
+		rootId[key] = struct{}{}
+	}
+
+	// Build body
+	if _, ok := ids[ROOT_PRODUCTION]; !ok {
+		rootBody = append(rootBody,
+			metaProduction{
+				id:        metaProductionId{originalId: 0, index: 0},
+				isRoot:    true,
+				completed: false})
+	}
+	rootBody = append(rootBody, others...)
+
+	root := metaNode{
+		id:          rootId,
+		name:        0,
+		metaProds:   rootBody,
+		completed:   false,
+		isFinal:     false,
+		transitions: make(map[Symbol]metaNodeId),
+	}
+
+	return &root
+}
+
+func getProductionClosure(dictionary []*parser.ParserProduction,
+	target parser.ParserSymbol) (metaNodeId, []metaProduction) {
 
 	visited := make(map[parser.ParserSymbol]struct{})
-	visited[productions[0].Head] = struct{}{}
 
-	rootId := make(metaNodeId)
-	rootId[0] = struct{}{}
+	nodeId := make(metaNodeId)
 
-	rootBody := []metaProduction{
-		{id: 0, isRoot: true, completed: false, index: 0}}
+	closure := []metaProduction{}
 
 	// Enqueue the fist element of the extended list of productions
 	// This will always be the extra production "S"
-	queue := []*parser.ParserSymbol{&productions[0].Body[0]}
+	queue := []*parser.ParserSymbol{&target}
 
 	for len(queue) > 0 {
 
@@ -67,20 +120,23 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 		visited[*symbol] = struct{}{}
 
 		// Search for productions with head == Symbol
-		for _, p := range productions {
+		for _, p := range dictionary {
 			if p.Head != *symbol {
 				continue
 			}
 
+			// Build new productoin Id
+			newId := metaProductionId{originalId: p.Id, index: 0}
 			// Add id to the root ID
-			rootId[p.Id] = struct{}{}
+			nodeId[newId] = struct{}{}
 
 			// Add productions found to rootBody
-			rootBody = append(rootBody, metaProduction{
-				id:        p.Id,
+			closure = append(closure, metaProduction{
+				id:        newId,
 				isRoot:    false,
 				completed: false,
-				index:     0})
+				length:    len(p.Body),
+			})
 
 			// If first element of the production's body is NON TERMINAL
 			// Add it to the queue
@@ -90,30 +146,101 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 		}
 	}
 
-	root := metaNode{
-		id:          rootId,
-		name:        0,
-		productions: rootBody,
-		completed:   false,
-		isFinal:     false,
-		Transitions: make(map[Symbol]metaNodeId),
+	return nodeId, closure
+}
+
+func (n *metaNode) getSymbolsToEvaluate(dictionary []*parser.ParserProduction) []*parser.ParserSymbol {
+
+	toCheck := make([]*parser.ParserSymbol, 0, len(n.metaProds))
+
+	inserted := make(map[parser.ParserSymbol]struct{})
+
+	for _, p := range n.metaProds {
+		if p.completed {
+			continue
+		}
+
+		// Getting the target production for dictionary
+		// And then current target symbol
+		targetSymbol := dictionary[p.id.originalId].Body[p.getIndex()]
+		// If production already added ignore it
+		if _, ok := inserted[targetSymbol]; ok {
+			continue
+		}
+		// Add symbol to the list
+		toCheck = append(toCheck, &targetSymbol)
+		inserted[targetSymbol] = struct{}{}
 	}
 
-	root.print()
-
-	return &root
+	return toCheck
 }
 
-func getFinalAutomata(metaAutomata *metaAutomata) *Automata {
-	return nil
-}
+func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.ParserProduction) *metaNode {
 
-func (n *metaNode) getSymbolsToEvaluate() []*parser.ParserSymbol {
+	nodeId := make(metaNodeId)
+	nodeBody := make([]metaProduction, 0)
+	isCompleted := false
+	isFinal := false
+	symbolsToClosure := make([]parser.ParserSymbol, 0)
 
-	return nil
-}
+	// runtime.Breakpoint()
+	// Loop over the productions of the current node
+	for _, metaProd := range n.metaProds {
 
-func (n *metaNode) evaluate(symbol *parser.ParserSymbol) *metaNode {
+		// If its is completed ignore it
+		if metaProd.completed {
+			continue
+		}
 
-	return nil
+		production := dictionary[metaProd.getDictIndex()]
+		targetSymbol := production.Body[metaProd.getIndex()]
+
+		// Select all productions were current_symbol == symbol
+		if targetSymbol != *symbol {
+			continue
+		}
+		// Move its point
+		if newIndex := metaProd.getIndex() + 1; newIndex <= metaProd.length {
+			// If index its already at the end, the scanned is completed
+			if metaProd.getIndex() == metaProd.length-1 {
+				metaProd.completed = true
+				isCompleted = true
+				metaProd.id.index++
+			} else {
+				metaProd.id.index++
+				symbolsToClosure = append(symbolsToClosure, production.Body[metaProd.getIndex()])
+			}
+		}
+
+		// Check if its final
+		if metaProd.id == ROOT_PRODUCTION {
+			isFinal = true
+		}
+
+		nodeId[metaProd.id] = struct{}{}
+		nodeBody = append(nodeBody, metaProd)
+		nodeId[metaProd.id] = struct{}{}
+	}
+
+	for _, v := range symbolsToClosure {
+		_, closure := getProductionClosure(dictionary, v)
+		for _, p := range closure {
+			if _, ok := nodeId[p.id]; ok {
+				continue
+			}
+			nodeId[p.id] = struct{}{}
+			nodeBody = append(nodeBody, p)
+		}
+	}
+
+	childNode := metaNode{
+		id:          nodeId,
+		name:        2,
+		metaProds:   nodeBody,
+		completed:   isCompleted,
+		isFinal:     isFinal,
+		transitions: map[Symbol]metaNodeId{},
+	}
+
+	return &childNode
 }
