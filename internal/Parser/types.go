@@ -11,6 +11,8 @@ type ParserDefinition struct {
 //
 //	{Head : "A", Body: ["A",+"A"]}
 type ParserProduction struct {
+	// Given by the order of definition in the yapar file, starting from 1
+	Id   int
 	Head ParserSymbol
 	// List of symbols that comprehend a production
 	Body []ParserSymbol
@@ -38,4 +40,5 @@ type ParserSymbol struct {
 
 const NON_TERMINAL_ID = -1
 
+// Used for first-follow computations
 type SymbolSet = map[ParserSymbol]struct{}
