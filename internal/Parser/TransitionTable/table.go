@@ -7,7 +7,20 @@ import (
 	"github.com/DanielRasho/Parser/internal/Parser/TransitionTable/automata"
 )
 
-func NewTransitionTable(a *automata.Automata) (*TransitionTbl, error) {
+func NewTransitionTable(a *automata.Automata, first map[string]parser.ParserSymbol, follow map[string]parser.ParserSymbol, production []parser.ParserProduction) (*TransitionTbl, error) {
+
+	acceptstates := []automata.State{}
+
+	// Asumamos que los estados sean ordenados osea I0 I1, asi etc
+	for i := 0; i < len(a.States); i++ {
+
+		if a.States[i].IsAccepted {
+			acceptstates = append(acceptstates, *a.States[i])
+		}
+
+		fmt.Println(acceptstates)
+
+	}
 
 	return nil, nil
 }

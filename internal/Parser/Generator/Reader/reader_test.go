@@ -7,7 +7,7 @@ import (
 
 func Test_check1(t *testing.T) {
 
-	el, _ := Parse("../../../../examples/productions.y")
+	el, _ := Parse("../../../../examples/productions2.y")
 
 	fmt.Println(el.Terminals)
 	fmt.Println(el.NonTerminals)

@@ -10,7 +10,7 @@
 %token )
 /*FINALIZA Sección de TOKENS */
 
-%%
+%% /* Delimitador para saber que son tokens y producciones */
 
 /* INICIA Sección de PRODUCCIONES */
 

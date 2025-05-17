@@ -29,7 +29,7 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 			token = strings.Split(token[1], " ")
 			for i := 1; i < len(token); i++ {
 				token[i] = strings.TrimSpace(token[i])
-				Tokens = append(Tokens, Parser.ParserSymbol{Id: len(Tokens), Value: token[i]})
+				Tokens = append(Tokens, Parser.ParserSymbol{Id: len(Tokens), Value: token[i], IsTerminal: true})
 			}
 
 		}
@@ -47,7 +47,7 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 							arrProductions = append(arrProductions, *Productions)
 							samehead := Productions.Head
-							Productions = &Parser.ParserProduction{Head: samehead}
+							Productions = &Parser.ParserProduction{Head: samehead, Id: (len(arrProductions) + 1)}
 
 							// fmt.Println("array", Productions.Body)
 
@@ -67,7 +67,9 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 									index_valnon = findIndex(nonterminals, token[i])
 								}
 								Productions.Body = append(Productions.Body, nonterminals[index_valnon])
+								Productions.Id = len(arrProductions) + 1
 							} else {
+								Productions.Id = len(arrProductions) + 1
 								Productions.Body = append(Productions.Body, Tokens[index_val])
 							}
 
