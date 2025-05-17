@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	parser "github.com/DanielRasho/Parser/internal/Parser"
-	"github.com/DanielRasho/Parser/internal/Parser/TransitionTable/automata"
+	"github.com/DanielRasho/Parser/internal/Parser/automata"
 )
 
 func NewTransitionTable(a *automata.Automata, first map[string]parser.ParserSymbol, follow map[string]parser.ParserSymbol, production []parser.ParserProduction) (*TransitionTbl, error) {

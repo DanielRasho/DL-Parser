@@ -2,7 +2,7 @@ package generator
 
 import (
 	reader "github.com/DanielRasho/Parser/internal/Parser/Generator/Reader"
-	transitiontable "github.com/DanielRasho/Parser/internal/Parser/TransitionTable"
+	"github.com/DanielRasho/Parser/internal/Parser/automata"
 )
 
 // Given a file to read and a output path, writes a parser definition to the desired path.
@@ -15,8 +15,10 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	}
 
 	// runtime.Breakpoint()
-	first := transitiontable.GetFirst(yalexDefinition)
-	transitiontable.GetFollow(yalexDefinition, first)
+	// first := transitiontable.GetFirst(yalexDefinition)
+	// transitiontable.GetFollow(yalexDefinition, first)
+
+	automata.NewAutomata(yalexDefinition)
 
 	return nil
 }
