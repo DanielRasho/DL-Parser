@@ -1,9 +1,6 @@
 package automata
 
 import (
-	"fmt"
-	"runtime"
-
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
 
@@ -11,7 +8,7 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 
 	// runtime.Breakpoint()
 	productionsDictionary := extendGrammar(df)
-	runtime.Breakpoint()
+	// runtime.Breakpoint()
 
 	getRootNode(productionsDictionary)
 
@@ -51,6 +48,8 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 	visited[productions[0].Head] = struct{}{}
 
 	rootId := make(metaNodeId)
+	rootId[0] = struct{}{}
+
 	rootBody := []metaProduction{
 		{id: 0, isRoot: true, completed: false, index: 0}}
 
@@ -73,8 +72,6 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 				continue
 			}
 
-			fmt.Println(p.Id)
-
 			// Add id to the root ID
 			rootId[p.Id] = struct{}{}
 
@@ -87,8 +84,8 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 
 			// If first element of the production's body is NON TERMINAL
 			// Add it to the queue
-			if p.Head.Id == parser.NON_TERMINAL_ID {
-				queue = append(queue, &p.Head)
+			if p.Body[0].Id == parser.NON_TERMINAL_ID {
+				queue = append(queue, &p.Body[0])
 			}
 		}
 	}
