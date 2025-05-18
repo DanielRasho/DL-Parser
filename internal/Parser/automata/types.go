@@ -54,7 +54,7 @@ type metaNode struct {
 	completed bool
 	// if the noded contains the root production
 	isFinal     bool
-	transitions map[Symbol]metaNodeId
+	transitions map[parser.ParserSymbol]*metaNode
 }
 
 // Representation of pseudo production. Rather than contain a production
@@ -104,7 +104,7 @@ func (m *metaNode) print() {
 
 	fmt.Println("  Transitions:")
 	for symbol, nodes := range m.transitions {
-		fmt.Printf("    - Symbol: %d -> %v\n", symbol, formatNodeId(nodes))
+		fmt.Printf("    - Symbol: %d -> %v\n", symbol, formatNodeId(nodes.id))
 	}
 	fmt.Println()
 }

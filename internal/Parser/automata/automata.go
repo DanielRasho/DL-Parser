@@ -1,6 +1,8 @@
 package automata
 
 import (
+	"fmt"
+
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
 
@@ -17,19 +19,47 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 	root := getRootNode(productionsDictionary)
 	root.print()
 
-	// queue := []*metaNode{root}
+	queue := []*metaNode{root}
+	nodes := []*metaNode{root}
 
-	toCheck := root.getSymbolsToEvaluate(productionsDictionary)
+	// toCheck := root.getSymbolsToEvaluate(productionsDictionary)
+	// newNode := root.evaluate(toCheck[0], productionsDictionary)
+	// newNode.print()
 
-	// _, a := getProductionClosure(productionsDictionary, *toCheck[2])
-	// fmt.Println(prettyPrintMetaProductions(a))
-	// runtime.Breakpoint()
-	a := root.evaluate(toCheck[2], productionsDictionary)
-	b := root.evaluate(toCheck[3], productionsDictionary)
+	for len(queue) > 0 {
+		currentNode := queue[0]
+		queue = queue[1:]
 
-	a.print()
-	b.print()
+		toCheck := currentNode.getSymbolsToEvaluate(productionsDictionary)
 
+		for _, symbol := range toCheck {
+			fmt.Println(symbol.Value)
+			fmt.Println("========================")
+			newNode := currentNode.evaluate(symbol, productionsDictionary)
+			// runtime.Breakpoint()
+			nodeExist := checkIdExist(nodes, newNode)
+			if nodeExist != nil {
+				currentNode.transitions[*symbol] = nodeExist
+				continue
+			}
+			nodes = append(nodes, newNode)
+			queue = append(queue, newNode)
+			currentNode.transitions[*symbol] = newNode
+			newNode.print()
+		}
+	}
+
+	fmt.Println(len(nodes))
+
+	return nil
+}
+
+func checkIdExist(nodes []*metaNode, newNode *metaNode) *metaNode {
+	for _, node := range nodes {
+		if areEqual := setsEqual(node.id, newNode.id); areEqual {
+			return node
+		}
+	}
 	return nil
 }
 
@@ -66,24 +96,21 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 	rootId := make(metaNodeId)
 	rootId[metaProductionId{originalId: 0, index: 0}] = struct{}{}
 
-	rootBody := make([]metaProduction, 0)
+	rootBody := []metaProduction{
+		{id: metaProductionId{originalId: 0, index: 0},
+			isRoot:    true,
+			completed: false,
+			length:    1,
+		}}
 
-	ids, others := getProductionClosure(productions, productions[0].Body[0])
-
-	// Build Id
-	for key := range ids {
-		rootId[key] = struct{}{}
+	_, closure := getProductionClosure(productions, productions[0].Body[0])
+	for _, p := range closure {
+		if _, ok := rootId[p.id]; ok {
+			continue
+		}
+		rootId[p.id] = struct{}{}
+		rootBody = append(rootBody, p)
 	}
-
-	// Build body
-	if _, ok := ids[ROOT_PRODUCTION]; !ok {
-		rootBody = append(rootBody,
-			metaProduction{
-				id:        metaProductionId{originalId: 0, index: 0},
-				isRoot:    true,
-				completed: false})
-	}
-	rootBody = append(rootBody, others...)
 
 	root := metaNode{
 		id:          rootId,
@@ -91,7 +118,7 @@ func getRootNode(productions []*parser.ParserProduction) *metaNode {
 		metaProds:   rootBody,
 		completed:   false,
 		isFinal:     false,
-		transitions: make(map[Symbol]metaNodeId),
+		transitions: make(map[parser.ParserSymbol]*metaNode),
 	}
 
 	return &root
@@ -129,6 +156,8 @@ func getProductionClosure(dictionary []*parser.ParserProduction,
 			newId := metaProductionId{originalId: p.Id, index: 0}
 			// Add id to the root ID
 			nodeId[newId] = struct{}{}
+
+			// print(len(p.Body))
 
 			// Add productions found to rootBody
 			closure = append(closure, metaProduction{
@@ -199,8 +228,11 @@ func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.Pa
 		if targetSymbol != *symbol {
 			continue
 		}
+
+		newIndex := metaProd.getIndex() + 1
+
 		// Move its point
-		if newIndex := metaProd.getIndex() + 1; newIndex <= metaProd.length {
+		if newIndex <= metaProd.length {
 			// If index its already at the end, the scanned is completed
 			if metaProd.getIndex() == metaProd.length-1 {
 				metaProd.completed = true
@@ -222,8 +254,8 @@ func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.Pa
 		nodeId[metaProd.id] = struct{}{}
 	}
 
-	for _, v := range symbolsToClosure {
-		_, closure := getProductionClosure(dictionary, v)
+	for _, s := range symbolsToClosure {
+		_, closure := getProductionClosure(dictionary, s)
 		for _, p := range closure {
 			if _, ok := nodeId[p.id]; ok {
 				continue
@@ -239,7 +271,7 @@ func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.Pa
 		metaProds:   nodeBody,
 		completed:   isCompleted,
 		isFinal:     isFinal,
-		transitions: map[Symbol]metaNodeId{},
+		transitions: make(map[parser.ParserSymbol]*metaNode),
 	}
 
 	return &childNode
