@@ -1,5 +1,10 @@
 package parser
 
+import (
+	"fmt"
+	"strings"
+)
+
 // Its a programatically representation of a yapar file.
 type ParserDefinition struct {
 	NonTerminals []ParserSymbol
@@ -16,6 +21,19 @@ type ParserProduction struct {
 	Head ParserSymbol
 	// List of symbols that comprehend a production
 	Body []ParserSymbol
+}
+
+func (p *ParserProduction) String() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%d: %s → ", p.Id, p.Head.Value))
+
+	for i, symbol := range p.Body {
+		if i > 0 {
+			sb.WriteString(" ")
+		}
+		sb.WriteString(symbol.Value)
+	}
+	return sb.String()
 }
 
 // Smallest information unit, the parser can read. Which is basically a symbol

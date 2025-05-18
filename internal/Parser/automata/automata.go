@@ -2,6 +2,7 @@ package automata
 
 import (
 	"fmt"
+	"strconv"
 
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
@@ -12,19 +13,18 @@ var ROOT_PRODUCTION = metaProductionId{originalId: ROOT_PRODUCTION_INDEX, index:
 
 func NewAutomata(df *parser.ParserDefinition) *Automata {
 
-	// runtime.Breakpoint()
 	productionsDictionary := extendGrammar(df)
-	// runtime.Breakpoint()
 
+	for i := range productionsDictionary {
+		fmt.Println(productionsDictionary[i].String())
+	}
+
+	// runtime.Breakpoint()
 	root := getRootNode(productionsDictionary)
 	root.print()
 
 	queue := []*metaNode{root}
 	nodes := []*metaNode{root}
-
-	// toCheck := root.getSymbolsToEvaluate(productionsDictionary)
-	// newNode := root.evaluate(toCheck[0], productionsDictionary)
-	// newNode.print()
 
 	for len(queue) > 0 {
 		currentNode := queue[0]
@@ -33,15 +33,14 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 		toCheck := currentNode.getSymbolsToEvaluate(productionsDictionary)
 
 		for _, symbol := range toCheck {
-			fmt.Println(symbol.Value)
-			fmt.Println("========================")
-			newNode := currentNode.evaluate(symbol, productionsDictionary)
-			// runtime.Breakpoint()
+			newNode := currentNode.evaluate(symbol, productionsDictionary, len(nodes))
 			nodeExist := checkIdExist(nodes, newNode)
 			if nodeExist != nil {
 				currentNode.transitions[*symbol] = nodeExist
 				continue
 			}
+			fmt.Println(symbol.Value)
+			fmt.Println("========================")
 			nodes = append(nodes, newNode)
 			queue = append(queue, newNode)
 			currentNode.transitions[*symbol] = newNode
@@ -49,7 +48,47 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 		}
 	}
 
+	fmt.Println("TOTAL NODES:")
 	fmt.Println(len(nodes))
+
+	// BUILD FINAL AUTOMATA
+	states := make([]*State, 0, len(nodes))
+
+	for i := range nodes {
+		node := nodes[i]
+		productions := make([]parser.ParserProduction, 0, len(node.metaProds))
+		transitions := make(map[parser.ParserSymbol]*State, len(node.transitions))
+
+		for _, p := range node.metaProds {
+			productions = append(productions, *productionsDictionary[p.getDictIndex()])
+		}
+
+		newState := State{
+			Id:          strconv.Itoa(node.name),
+			Productions: productions,
+			Transitions: transitions,
+			IsFinal:     node.isFinal,
+			IsAccepted:  node.completed}
+		states = append(states, &newState)
+	}
+
+	for i := range nodes {
+		node := nodes[i]
+		state := states[i]
+
+		for key, value := range node.transitions {
+			state.Transitions[key] = states[value.name]
+		}
+	}
+
+	automata := Automata{
+		StartState: states[0],
+		States:     states,
+	}
+
+	dot := GenerateDOT_SLR0(&automata)
+
+	GenerateImage(dot, "uwu.png")
 
 	return nil
 }
@@ -204,7 +243,7 @@ func (n *metaNode) getSymbolsToEvaluate(dictionary []*parser.ParserProduction) [
 	return toCheck
 }
 
-func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.ParserProduction) *metaNode {
+func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.ParserProduction, nextName int) *metaNode {
 
 	nodeId := make(metaNodeId)
 	nodeBody := make([]metaProduction, 0)
@@ -267,7 +306,7 @@ func (n *metaNode) evaluate(symbol *parser.ParserSymbol, dictionary []*parser.Pa
 
 	childNode := metaNode{
 		id:          nodeId,
-		name:        2,
+		name:        nextName,
 		metaProds:   nodeBody,
 		completed:   isCompleted,
 		isFinal:     isFinal,
