@@ -56,3 +56,18 @@ What is the parser doing?
 
 3. Now we introduce all componentes from the generator to a Parser template for GO in order to compile it and get a file to run it. 
 
+
+## Data Structures
+
+If you are more curious of how this was implemented on the code, you may start with the data types definitions. Almost every go module created has its own `types.go` file with the most important type definitions that modules exposes. Here are a list of the most importants:
+
+# Yapar definition
+https://github.com/DanielRasho/DL-Parser/blob/04793e148851f7b11137f49fbcca6fd51c9d85fc/internal/Parser/types.go#L9-L24
+
+# Transition Table
+
+https://github.com/DanielRasho/DL-Parser/blob/04793e148851f7b11137f49fbcca6fd51c9d85fc/internal/Parser/TransitionTable/types.go#L3-L25
+
+# SLR0 Automata
+
+https://github.com/DanielRasho/DL-Parser/blob/04793e148851f7b11137f49fbcca6fd51c9d85fc/internal/Parser/automata/types.go#L10-L23
