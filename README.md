@@ -7,6 +7,7 @@ It uses a **Deterministic Finite Automata(DFA)** for Regex Patterns recognition,
 
 ## Architecture videos
 - [Part 1](https://youtu.be/WDLBOrFDXdQ)
+- [Part 2](https://www.youtube.com/watch?v=fDSfsjr2_4I)
 
 ## Getting Started 🎬
 
