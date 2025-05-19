@@ -6,7 +6,13 @@ import (
 )
 
 func main() {
-	lexer, err := NewLexer("./examples/test1.yaa")
+
+	if len(os.Args) > 2 {
+		fmt.Println("Usage: task lex:run -- <input file>")
+		os.Exit(1)
+	}
+
+	lexer, err := NewLexer(os.Args[1])
 	if err != nil {
 		fmt.Println(err.Error())
 	}

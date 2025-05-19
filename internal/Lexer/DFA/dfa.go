@@ -16,7 +16,7 @@ import (
 // - Common Symbol : just represents a plain character
 //
 // Returns the DFA built, the number of final symbols (used for absortion state removal)
-func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool) (*DFA, int, error) {
+func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool, renderDiagrams bool) (*DFA, int, error) {
 
 	// Convert Raw Symbols to Symbols on postfix
 	_, postfixExpr, err := postfix.RegexToPostfix(rawExpresion)
@@ -35,7 +35,9 @@ func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool) (*DFA, int, error) 
 	// Build Abstract Syntax Tree
 
 	ast := BuildAST(postfixExpr)
-	RenderAST(ast, "./diagram/tree.png")
+	if renderDiagrams {
+		RenderAST(ast, "./diagrams/tree.png")
+	}
 	centinelNode := node{
 		Id:         len(postfixExpr),
 		Value:      "#",

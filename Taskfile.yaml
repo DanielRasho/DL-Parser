@@ -1,35 +1,32 @@
 version: '3'
 
 tasks:
-  build:
-    desc: Build the Go project
-    cmds:
-      - go build -o bin/main ./cmd/LexerGenerator/LexerGenerator.go
 
-  run:
-    desc: Run the lexer generator
-    deps: [build]
+  compiler:run:
+    desc: runs a pseudo-compiler with lexer and parser definitions
     cmds:
-      - ./bin/main -f "{{.INPUTFILE}}" -o "{{.OUTPUTPATH}}"
-    vars:
-      INPUTFILE: "{{.INPUTFILE}}"
-      OUTPUTPATH: "{{.OUTPUTPATH}}"
+      - go build -o bin/main ./cmd/LexerGenerator/LexerGenerator.go {{.CLI_ARGS}}
 
-  testLex:
-    desc: Run the Go project with input file and output path
-    deps: [build]
+  compiler:build:
+    desc: Builds a pseudo-compiler with lexer and parser definitions
     cmds:
-      - ./bin/main -f "{{.YALEX}}" -o ./cmd/Lexer/lexer.go
-      - go run ./cmd/Lexer/*
-    vars:
-      YALEX: "{{.YALEX}}"
+      - go build -o bin/compiler ./cmd/compiler/main.go {{.CLI_ARGS}}
 
-  clean:
-    desc: Clean the build artifacts
+  parser:generate:
+    desc: Generates a parser.go file
     cmds:
-      - rm -rf bin/
-      - go clean -cache -modcache -testcache -i
+      - go run ./cmd/parserGenerator/*.go {{.CLI_ARGS}}
 
+  lex:run:
+    desc: Run lexer executable
+    cmds:
+      - go run ./cmd/lexer/*.go {{.CLI_ARGS}}
+
+  lex:generate:
+    desc: Build Lexer executable
+    cmds:
+      - go run ./cmd/lexerGenerator/*.go {{.CLI_ARGS}}
+  
   test:
     desc: Run tests, optionally filtering by pattern
     cmds:
@@ -41,8 +38,3 @@ tasks:
         fi
     vars:
       PATTERN: "{{.PATTERN | default \"\"}}"
-  
-  buildParser:
-    desc: Build the Go project
-    cmds:
-      - go build -o bin/parser ./cmd/FirstFollow/main.go

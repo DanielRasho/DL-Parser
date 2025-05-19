@@ -6,7 +6,7 @@
     const (
         LITERAL = iota
         NUMBER
-        COND
+        DIGIT
         WS
     )
 %}
@@ -14,18 +14,16 @@
 // ====== NAMED PATTERNS =======
 {
     // Define named patterns using regular expressions
-    LETTER   ([a-c])+
-    DIGIT    [1-3]
-    OWO      {LETTER}-{DIGIT}
-    ID       {LETTER}({LETTER}|{DIGIT})*  // ID consists of letters and digits
+    LETTER   ([a-b])+
+    DIGIT    ([1-2])
     NUMBER   {DIGIT}+  // NUMBER consists of one or more digits
-    WS       ([ \t\n\r])+  // Whitespace: spaces, tabs, newlines, or carriage returns
+    WS       ([ \t\n])+  // Whitespace: spaces, tabs, newlines, or carriage returns
 }
 
 // ======= RULES ========
 %%
 {LETTER}         { return LITERAL }   // Match letters and return LITERAL
-{DIGIT}          { return NUMBER }    // Match digits and return NUMBER
-{OWO}          { return WS }    // Match digits and return NUMBER
+{NUMBER}          { return NUMBER }    // Match digits and return NUMBER
+{WS}         { return WS }
 
 %%

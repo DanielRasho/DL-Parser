@@ -1,0 +1,44 @@
+/* ========== PARSER DEFINITION FOR SIMPLE ARITHMETIC LANGUAGE ========== */
+
+/* INICIA Sección de TOKENS */
+%token LET ASSIGN PLUS MINUS MULT DIV ID NUMBER SEMICOLON WS
+IGNORE WS
+
+/* FINALIZA Sección de TOKENS */
+
+%%
+
+/* INICIA Sección de PRODUCCIONES */
+
+program:
+    program statement
+  | statement
+;
+
+statement:
+    var_decl
+  | expression SEMICOLON
+;
+
+var_decl:
+    LET ID ASSIGN expression SEMICOLON
+;
+
+expression:
+    expression PLUS term
+  | expression MINUS term
+  | term
+;
+
+term:
+    term MULT factor
+  | term DIV factor
+  | factor
+;
+
+factor:
+    ID
+  | NUMBER
+;
+
+/* FINALIZA Sección de PRODUCCIONES */
