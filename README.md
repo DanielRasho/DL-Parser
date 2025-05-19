@@ -74,3 +74,21 @@ https://github.com/DanielRasho/DL-Parser/blob/04793e148851f7b11137f49fbcca6fd51c
 ### SLR0 Automata
 
 https://github.com/DanielRasho/DL-Parser/blob/04793e148851f7b11137f49fbcca6fd51c9d85fc/internal/Parser/automata/types.go#L10-L23
+
+### EXAMPLE OF ALL ARQUITECTURE
+![image](https://github.com/user-attachments/assets/f75813fe-cb3a-46b8-a7d0-85f5e71a192b)
+First, we create the YAPAR file where we identify the tokens and the productions that need to be parsed. We begin by reading the tokens and determining whether they are terminals. Then, there is a delimiter that signals when to start reading the productions. All of this is passed to a definition that identifies whether it is a non-terminal, terminal, and its corresponding productions.
+
+![image](https://github.com/DanielRasho/DL-Parser/blob/main/pictures/First_Follow.png)
+We then proceed with the First and Follow sets, where we find that First(E) is equal to First(T). After that, we calculate the Follow set in order to use it in the transition table.
+
+![image](https://github.com/DanielRasho/DL-Parser/blob/main/pictures/Automata.png)
+Before performing the transitions, we also need to generate the automaton, where we identify the accepting and final states in order to compute the shift and reduce actions.
+
+![image](https://github.com/user-attachments/assets/dbf329d0-e132-4a36-a4e5-cb23d5669668)
+With the transition table, we need the First and Follow sets, as well as the automaton, in order to compute the transition table and the GOTO table. These will be used to return a structure that should be embedded into a Go template for the purpose of parsing the input from a file.
+
+![image](https://github.com/user-attachments/assets/b6460113-f9c8-4bc6-90f6-dd85c9ea5709)
+So, once we integrate the transition table and the productions, we generate them in a main.go file that reads the input file, which contains the string to be parsed. Therefore, in our example, we use int + int, where we can see that the string must be accepted.
+
+
