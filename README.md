@@ -5,6 +5,9 @@ Hi! This project aims to be an educational implementation of a **Lexer Generator
 
 It uses a **Deterministic Finite Automata(DFA)** for Regex Patterns recognition, and a **L0 Automata** for syntax recognition. Down below, there will be more explanation about the actual pipeline the inputs suffer in order to recognize tokens.
 
+## Architecture videos
+- [Part 1](https://youtu.be/WDLBOrFDXdQ)
+
 ## Getting Started 🎬
 
 ```bash
