@@ -2,6 +2,8 @@ package dfa
 
 import postfix "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
 
+const EPSILON_SYMBOL_ID = -1
+
 /*
 BuildAST construye un AST a partir de una lista de símbolos en notación postfix.
 Parámetros:
@@ -55,7 +57,7 @@ func BuildAST(postfixSymbols []postfix.Symbol) node {
 			// Si no es un operador, es un carácter (Symbol) y se añade al stack
 			if symbol.Value == "ε" {
 				node := node{
-					Id:         -1, // stands for leaf that must not be taken into account
+					Id:         EPSILON_SYMBOL_ID, // stands for leaf that must not be taken into account
 					Value:      symbol.Value,
 					IsOperator: false}
 				stack = append(stack, node)

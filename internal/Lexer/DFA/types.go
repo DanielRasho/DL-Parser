@@ -52,6 +52,9 @@ type nodeSet struct {
 
 // Definition of a tree node
 type node struct {
+	// Negative Id's denote operator nodes
+	// Positive Id's denote final nodes
+	// Especial case ε, id is always -1
 	Id       int
 	Nullable bool
 	// Character itself this node represents

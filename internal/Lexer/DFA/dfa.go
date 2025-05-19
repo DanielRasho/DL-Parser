@@ -41,7 +41,7 @@ func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool, renderDiagrams bool
 	centinelNode := node{
 		Id:         len(postfixExpr),
 		Value:      "#",
-		Operands:   2,
+		Operands:   0,
 		Children:   []node{ast},
 		IsOperator: false,
 		IsFinal:    true,
@@ -54,6 +54,8 @@ func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool, renderDiagrams bool
 		Operands:   2,
 		Children:   []node{ast, centinelNode},
 		IsOperator: true}
+
+	// runtime.Breakpoint()
 
 	// Generate DFA with direct method
 	finalSymbols := findFinalSymbols(postfixExpr)
@@ -124,7 +126,7 @@ func getNodePosition(root *node, positionTable map[int]positionTableRow) (bool, 
 	}
 
 	// Else if node is empty string
-	if root.Value == "ε" {
+	if !root.IsOperator && root.Id == EPSILON_SYMBOL_ID {
 		isNullable := true
 		firstPos := make([]int, 0)
 		lastPos := make([]int, 0)

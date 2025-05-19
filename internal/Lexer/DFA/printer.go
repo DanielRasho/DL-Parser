@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 func intSliceToString(slice []int) string {
@@ -18,48 +20,67 @@ func intSliceToString(slice []int) string {
 }
 
 func printPositionTable(table map[int]positionTableRow) {
-	fmt.Printf("%-5s %-10s %-8s %-8s %-15s %-15s %-15s %s\n",
-		"Key", "Token", "Nullable", "IsFinal", "FirstPos", "LastPos", "FollowPos", "Actions")
-	fmt.Println(strings.Repeat("-", 80))
+	header := []string{"Key", "Token", "Nullable", "IsFinal", "FirstPos", "LastPos", "FollowPos", "Actions"}
 
+	data := make([][]string, 0, len(table))
 	for key, row := range table {
-		actions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(row.action)), ","), "[]")
-		fmt.Printf("%-5d %-10s %-8t %-8t %-20s %-15s %-15s %s\n",
-			key, row.token, row.nullable, row.isFinal,
+		actions := fmt.Sprintf("{%d, %s}", row.action.Priority, row.action.Code)
+		data = append(data, []string{
+			fmt.Sprintf("%d", key),
+			row.token,
+			fmt.Sprintf("%t", row.nullable),
+			fmt.Sprintf("%t", row.isFinal),
 			intSliceToString(row.firstPos),
 			intSliceToString(row.lastPos),
 			intSliceToString(row.followPos),
-			actions)
+			actions,
+		})
 	}
+
+	tableWriter := tablewriter.NewWriter(os.Stdout)
+	tableWriter.Header(header)
+	tableWriter.Bulk(data)
+	tableWriter.Render()
 }
 
 func printStateSetTable(states []*nodeSet, transitionTokens []string) {
-	// Print header
-	fmt.Printf("%-5s | %-10s | %-7s| %-30s", "ID", "Value", "isFinal", "Action")
-	for _, token := range transitionTokens {
-		fmt.Printf(" | %-10s", token)
-	}
-	fmt.Println("\n" + strings.Repeat("-", 53+12*len(transitionTokens)))
+	// Define the header
+	header := []string{"ID", "Value", "isFinal", "Actions"}
+	header = append(header, transitionTokens...)
 
-	// Print rows
+	// Prepare the data for tablewriter
+	data := make([][]string, 0, len(states))
 	for _, state := range states {
 		// Convert value slice to a comma-separated string
 		valueStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(state.value)), ","), "[]")
 		actions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(state.actions)), ","), "[]")
 
-		// Print ID, Value, and isFinal
-		fmt.Printf("%-5d | %-10s | %-7t| %-30v", state.id, valueStr, state.isFinal, actions)
+		// Initialize the row with ID, Value, isFinal, and Actions
+		row := []string{
+			fmt.Sprintf("%d", state.id),
+			valueStr,
+			fmt.Sprintf("%t", state.isFinal),
+			actions,
+		}
 
-		// Print transitions
+		// Fill in the transitions for each token
 		for _, token := range transitionTokens {
 			if nextState, exists := state.transitions[token]; exists {
-				fmt.Printf(" | %-10d", nextState.id)
+				row = append(row, fmt.Sprintf("%d", nextState.id))
 			} else {
-				fmt.Printf(" | %-10s", "-")
+				row = append(row, "-")
 			}
 		}
-		fmt.Println()
+
+		// Append the row to the data slice
+		data = append(data, row)
 	}
+
+	// Create and render the table
+	tableWriter := tablewriter.NewWriter(os.Stdout)
+	tableWriter.Header(header)
+	tableWriter.Bulk(data)
+	tableWriter.Render()
 }
 
 func PrintDFA(dfa *DFA) {
