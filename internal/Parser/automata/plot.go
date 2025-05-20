@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ func GenerateDOT_SLR0(automata *Automata) string {
 	// Define the nodes (states)
 	for _, state := range automata.States {
 		shape := getShape(state.IsFinal, state.IsAccepted)
-		label := state.Id
+		label := strconv.Itoa(state.Id)
 
 		// Append productions to label if any
 		if len(state.Productions) > 0 {
@@ -35,20 +36,20 @@ func GenerateDOT_SLR0(automata *Automata) string {
 			}
 		}
 
-		sb.WriteString(fmt.Sprintf("    \"%s\" [label=\"%s\", shape=%s];\n", state.Id, label, shape))
+		sb.WriteString(fmt.Sprintf("    \"%d\" [label=\"%s\", shape=%s];\n", state.Id, label, shape))
 	}
 
 	// Define the transitions
 	for _, state := range automata.States {
 		for symbol, toState := range state.Transitions {
-			sb.WriteString(fmt.Sprintf("    \"%s\" -> \"%s\" [label=\"%s\"];\n",
+			sb.WriteString(fmt.Sprintf("    \"%d\" -> \"%d\" [label=\"%s\"];\n",
 				state.Id, toState.Id, symbol.Value))
 		}
 	}
 
 	// Define the start state
 	sb.WriteString(fmt.Sprintln("    \"\" [shape=plaintext,label=\"\"];"))
-	sb.WriteString(fmt.Sprintf("    \"\" -> \"%s\";\n", automata.StartState.Id))
+	sb.WriteString(fmt.Sprintf("    \"\" -> \"%d\";\n", automata.StartState.Id))
 
 	sb.WriteString("}\n")
 

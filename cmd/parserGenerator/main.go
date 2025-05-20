@@ -12,6 +12,7 @@ func main() {
 	// Define the flags
 	fileFlag := flag.String("f", "", "Yalex file path")
 	outputFlag := flag.String("o", "", "Output file path")
+	isVerbose := flag.Bool("verbose", false, "Show logs")
 
 	// Parse the command line flags
 	flag.Parse()
@@ -27,7 +28,7 @@ func main() {
 	fmt.Printf("Output file: %s\n", *outputFlag)
 
 	// CODE FOR GENERATING LEXER ...
-	err := generator.Compile(*fileFlag, *outputFlag, true)
+	err := generator.Compile(*fileFlag, *outputFlag, *isVerbose)
 	if err != nil {
 		fmt.Println(err)
 	}

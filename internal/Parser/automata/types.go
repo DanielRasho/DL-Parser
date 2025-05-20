@@ -15,7 +15,7 @@ type Automata struct {
 type Symbol = int
 
 type State struct {
-	Id          string
+	Id          int
 	Productions []parser.ParserProduction      // Sorted by highest too lower priority ( 0 has the hightes priority )
 	Transitions map[parser.ParserSymbol]*State // {"a": STATE1, "b": STATE2, "NUMBER": STATEFINAL}
 	IsFinal     bool
@@ -25,12 +25,6 @@ type State struct {
 // =========================
 // 	INTERNAL
 // =========================
-
-// pseudo-automata. Its an intermediate representation for the SLR automata.
-type metaAutomata struct {
-	StartState *metaNode
-	States     []*metaNode
-}
 
 // ID for metaNode, represents a set of production's id
 type metaNodeId = map[metaProductionId]struct{}

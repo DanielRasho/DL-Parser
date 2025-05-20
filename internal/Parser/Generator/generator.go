@@ -18,7 +18,7 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	// first := transitiontable.GetFirst(yalexDefinition)
 	// transitiontable.GetFollow(yalexDefinition, first)
 
-	automata.NewAutomata(yalexDefinition)
+	automata.NewAutomata(yalexDefinition, showLogs)
 
 	return nil
 }

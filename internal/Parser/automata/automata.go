@@ -2,7 +2,6 @@ package automata
 
 import (
 	"fmt"
-	"strconv"
 
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 )
@@ -11,49 +10,62 @@ const ROOT_PRODUCTION_INDEX int = 0
 
 var ROOT_PRODUCTION = metaProductionId{originalId: ROOT_PRODUCTION_INDEX, index: 0}
 
-func NewAutomata(df *parser.ParserDefinition) *Automata {
-
-	var showprints = true
+func NewAutomata(df *parser.ParserDefinition, showLogs bool) *Automata {
 
 	productionsDictionary := extendGrammar(df)
 
-	if showprints {
+	if showLogs {
 		for i := range productionsDictionary {
 			fmt.Println(productionsDictionary[i].String())
 		}
 	}
 
-	// runtime.Breakpoint()
+	// Build the Root node, with required productions
 	root := getRootNode(productionsDictionary)
-	root.print()
+
+	if showLogs {
+		root.print()
+	}
 
 	queue := []*metaNode{root}
 	nodes := []*metaNode{root}
 
+	// Build remaining roots progresivelly
 	for len(queue) > 0 {
 		currentNode := queue[0]
 		queue = queue[1:]
 
+		// Get which symbols must be evaluated based on the productions
+		// of the current node
 		toCheck := currentNode.getSymbolsToEvaluate(productionsDictionary)
 
+		// Evalute each symbol, and produce a new child node
 		for _, symbol := range toCheck {
 			newNode := currentNode.evaluate(symbol, productionsDictionary, len(nodes))
+			// If child node doest not currently exist add it to the automata
 			nodeExist := checkIdExist(nodes, newNode)
 			if nodeExist != nil {
 				currentNode.transitions[*symbol] = nodeExist
 				continue
 			}
-			fmt.Println(symbol.Value)
-			fmt.Println("========================")
+			// if not add, it to the automata
 			nodes = append(nodes, newNode)
+			// add it to the queue for future evaluation
 			queue = append(queue, newNode)
+			// Add a transition state from the current node to the child node
 			currentNode.transitions[*symbol] = newNode
-			newNode.print()
+			if showLogs {
+				fmt.Println(symbol.Value)
+				fmt.Println("========================")
+				newNode.print()
+			}
 		}
 	}
 
-	fmt.Println("TOTAL NODES:")
-	fmt.Println(len(nodes))
+	if showLogs {
+		fmt.Println("TOTAL NODES:")
+		fmt.Println(len(nodes))
+	}
 
 	// BUILD FINAL AUTOMATA
 	states := make([]*State, 0, len(nodes))
@@ -68,7 +80,7 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 		}
 
 		newState := State{
-			Id:          strconv.Itoa(node.name),
+			Id:          node.name,
 			Productions: productions,
 			Transitions: transitions,
 			IsFinal:     node.isFinal,
@@ -92,7 +104,7 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 
 	dot := GenerateDOT_SLR0(&automata)
 
-	GenerateImage(dot, "uwu.png")
+	GenerateImage(dot, "./diagrams/SLR0_Automata.png")
 
 	return &automata
 }
