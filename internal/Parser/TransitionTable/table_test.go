@@ -5,22 +5,20 @@ import (
 	"testing"
 
 	reader "github.com/DanielRasho/Parser/internal/Parser/Generator/Reader"
+	"github.com/DanielRasho/Parser/internal/Parser/automata"
 )
 
 func Test_check1(t *testing.T) {
 
-	el, _ := reader.Parse("../../../../examples/productions2.y")
-	first := GetFirst(el)
-	GetFollow(el, first)
+	parserdef, _ := reader.Parse("../../../examples/productions2.y")
+	first := GetFirst(parserdef)
+	follow := GetFollow(parserdef, first)
+	var automa = automata.NewAutomata(parserdef)
 
-	// automata := &automata.Automata{
-	// 	States: []*automata.State{
-	// 		{Id: "I1", Transitions: map[Symbol]*State{},IsAccepted: true ,IsFinal: true ,Productions: []parser.ParserProduction{  parser.ParserProduction{ Head: parser.ParserSymbol{Id: -1, Value: "S'", IsTerminal: true}, Body:[]parser.ParserSymbol{ parser.ParserSymbol{ Id: -1, Value: "E", IsTerminal: false} }}}
-	// 	}
-	// }
+	TransitionTabl, gotable, _ := NewTable(automa, first, follow, *parserdef)
 
-	fmt.Println(el.Terminals)
-	fmt.Println(el.NonTerminals)
-	fmt.Println(el.Productions)
-
+	fmt.Println("TABLA DE TRANSICION")
+	fmt.Println(TransitionTabl)
+	fmt.Println("GOTO")
+	fmt.Println(gotable)
 }

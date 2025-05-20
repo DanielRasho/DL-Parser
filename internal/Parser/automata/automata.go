@@ -13,10 +13,14 @@ var ROOT_PRODUCTION = metaProductionId{originalId: ROOT_PRODUCTION_INDEX, index:
 
 func NewAutomata(df *parser.ParserDefinition) *Automata {
 
+	var showprints = true
+
 	productionsDictionary := extendGrammar(df)
 
-	for i := range productionsDictionary {
-		fmt.Println(productionsDictionary[i].String())
+	if showprints {
+		for i := range productionsDictionary {
+			fmt.Println(productionsDictionary[i].String())
+		}
 	}
 
 	// runtime.Breakpoint()
@@ -90,7 +94,7 @@ func NewAutomata(df *parser.ParserDefinition) *Automata {
 
 	GenerateImage(dot, "uwu.png")
 
-	return nil
+	return &automata
 }
 
 func checkIdExist(nodes []*metaNode, newNode *metaNode) *metaNode {

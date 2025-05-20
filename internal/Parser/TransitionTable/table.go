@@ -2,27 +2,68 @@ package transitiontable
 
 import (
 	"fmt"
+	"strconv"
 
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 	"github.com/DanielRasho/Parser/internal/Parser/automata"
 )
 
-func NewTransitionTable(a *automata.Automata, first map[string]parser.ParserSymbol, follow map[string]parser.ParserSymbol, production []parser.ParserProduction) (*TransitionTbl, error) {
+func NewTable(a *automata.Automata, first map[string]parser.SymbolSet, follow map[string]parser.SymbolSet, Parserdefinition parser.ParserDefinition) (*TransitionTbl, *GotoTbl, error) {
 
-	acceptstates := []automata.State{}
-
-	// Asumamos que los estados sean ordenados osea I0 I1, asi etc
+	gototable := GotoTbl{}
+	transit := TransitionTbl{}
+	// Leemos para el go to
 	for i := 0; i < len(a.States); i++ {
+		gototable[i] = GotoTblRow{}
+		transit[i] = TransitionTblRow{}
+		for e := range a.States[i].Transitions {
 
-		if a.States[i].IsAccepted {
-			acceptstates = append(acceptstates, *a.States[i])
+			//Identifica si es no terminal para agregarlo a la tabla de goto
+			if CheckNonTerminal(e.Value, Parserdefinition) {
+
+				idnumber, _ := strconv.Atoi(a.States[i].Id)
+				gototable[idnumber][e.Value] = Movement{MovementType: 2, NextRow: a.States[i].Transitions[e].Id}
+				// fmt.Println(transit)
+			}
+			// Si es un terminal entonces solo se agrega los shift
+			if !CheckNonTerminal(e.Value, Parserdefinition) {
+				idnumber, _ := strconv.Atoi(a.States[i].Id)
+				transit[idnumber][e.Value] = Movement{MovementType: 0, NextRow: a.States[i].Transitions[e].Id}
+			}
+
 		}
 
-		fmt.Println(acceptstates)
+		if a.States[i].IsAccepted {
+			toshift := a.States[i].Productions[0]
+			for e := 0; e < len(a.States[i].Productions); e++ {
+
+				if len(a.States[i].Productions[e].Body) < len(toshift.Body) {
+					toshift = a.States[i].Productions[e]
+				}
+
+			}
+
+			if a.States[i].Id == "1" {
+				idnumber, _ := strconv.Atoi(a.States[i].Id)
+				transit[idnumber]["$"] = Movement{MovementType: 3, NextRow: "ACCEPT"}
+
+			} else {
+
+				// fmt.Println(Parserdefinition.Productions[Getindexprodcutions(toshift, Parserdefinition)])
+				fset := follow[Parserdefinition.Productions[Getindexprodcutions(toshift, Parserdefinition)].Head.Value]
+				for sym := range fset {
+					idnumber, _ := strconv.Atoi(a.States[i].Id)
+					value := strconv.Itoa(Getindexprodcutions(toshift, Parserdefinition))
+					transit[idnumber][sym.Value] = Movement{MovementType: 1, NextRow: value}
+				}
+
+			}
+
+		}
 
 	}
 
-	return nil, nil
+	return &transit, &gototable, nil
 }
 
 func GetFirst(def *parser.ParserDefinition) map[string]parser.SymbolSet {
@@ -151,6 +192,34 @@ func GetFollow(def *parser.ParserDefinition,
 	return followSet
 }
 
-func NewTable(*parser.ParserDefinition) {
+func CheckNonTerminal(id string, definition parser.ParserDefinition) bool {
+	for i := 0; i < len(definition.NonTerminals); i++ {
+		if definition.NonTerminals[i].Value == id {
+			return true
+		}
+	}
 
+	return false
+
+}
+
+func Getindexprodcutions(prod parser.ParserProduction, parsedef parser.ParserDefinition) int {
+	for i := 0; i < len(parsedef.Productions); i++ {
+		if prod.Head.Value == parsedef.Productions[i].Head.Value && equalBodies(prod.Body, parsedef.Productions[i].Body) {
+			return i
+		}
+	}
+	return -1 // Not found
+}
+
+func equalBodies(a, b []parser.ParserSymbol) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Value != b[i].Value {
+			return false
+		}
+	}
+	return true
 }
