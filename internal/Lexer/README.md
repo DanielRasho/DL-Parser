@@ -1,3 +1,5 @@
+<h1 align="center">Lexer 🚀</h1>
+
 ## The YALex File 📄
 Since YALex initial definition was meant for C, we tweak it a little bit to be easer to work with using Go. Below is the structure for a YALEX go file. You can find more examples on `examples/`
 
