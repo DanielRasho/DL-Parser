@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Define the flags
-	fileFlag := flag.String("f", "", "Yalex file path")
+	fileFlag := flag.String("f", "", "Parser file path")
 	outputFlag := flag.String("o", "", "Output file path")
 	diagramFlag := flag.Bool("diagram", true, "Render automata diagrams")
 

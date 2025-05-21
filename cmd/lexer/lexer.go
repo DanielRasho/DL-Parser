@@ -15,31 +15,27 @@ import (
 // Contains the exact same content defined on the Yaaalex file
 // Tokens IDs should be defined here.
 
-    // The entire contents of this section will be copied to the beginning of the generated Lexer.go file
+// The entire contents of this section will be copied to the beginning of the generated Lexer.go file
 
-    //  ------ TOKENS ID -----
+//  ------ TOKENS ID -----
 
-    // Define the token types that the lexer will recognize
+// Define the token types that the lexer will recognize
 
-    const (
+const (
+	LITERAL = iota
 
-        LITERAL = iota
+	NUMBER
 
-        NUMBER
+	DIGIT
 
-        DIGIT
-
-        WS
-
-    )
-
-
+	WS
+)
 
 // =====================
 //	  Lexer
 // =====================
 
-const NO_LEXEME = -1 // Flag constant that is used when no lexeme is recognized nor 
+const NO_LEXEME = -1   // Flag constant that is used when no lexeme is recognized nor
 const SKIP_LEXEME = -2 // Flag when an action require the lexer to IGNORE the current lexeme
 
 // PatternNotFound represents an error when a pattern is not found in a file
@@ -123,7 +119,7 @@ func (l *Lexer) GetNextToken() (Token, error) {
 				lastTokenID = newTokenID
 			}
 		}
-		// 2. Read the next rune 
+		// 2. Read the next rune
 		r, size, err := l.reader.ReadRune()
 		if err != nil {
 			// return the last recognized lexeme
@@ -232,65 +228,68 @@ type state struct {
 }
 
 // Representes a user defined action that should happen
-// when a pattern is recognized. The function should return an int, that represents a 
-// tokenID. Its shape should be look something like : 
-// 
-// 	func () int {
-// 		tokenID := SKIP_LEXEM
-//		<user defined code>
-//		return tokenID
-//  }
+// when a pattern is recognized. The function should return an int, that represents a
+// tokenID. Its shape should be look something like :
 //
+//		func () int {
+//			tokenID := SKIP_LEXEM
+//			<user defined code>
+//			return tokenID
+//	 }
 type action func() int
 
 // createDFA constructs the DFA that recognizes the user language.
 func createDFA() *dfa {
-	state5 := &state{id: "5" , transitions: make(map[Symbol]*state), isFinal: true}
-state0 := &state{id: "0" , 
-actions: []action{ 
-}, transitions: make(map[Symbol]*state), isFinal: false}
-state1 := &state{id: "1" , 
-actions: []action{ 
- func() int { return WS 
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
-state2 := &state{id: "2" , 
-actions: []action{ 
- func() int { return LITERAL 
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
-state3 := &state{id: "3" , 
-actions: []action{ 
- func() int { return NUMBER 
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
+	state5 := &state{id: "5", transitions: make(map[Symbol]*state), isFinal: true}
+	state0 := &state{id: "0",
+		actions: []action{}, transitions: make(map[Symbol]*state), isFinal: false}
+	state1 := &state{id: "1",
+		actions: []action{
+			func() int {
+				return WS
+				return SKIP_LEXEME
+			},
+		}, transitions: make(map[Symbol]*state), isFinal: false}
+	state2 := &state{id: "2",
+		actions: []action{
+			func() int {
+				return LITERAL
+				return SKIP_LEXEME
+			},
+		}, transitions: make(map[Symbol]*state), isFinal: false}
+	state3 := &state{id: "3",
+		actions: []action{
+			func() int {
+				return NUMBER
+				return SKIP_LEXEME
+			},
+		}, transitions: make(map[Symbol]*state), isFinal: false}
 
-state0.transitions["b"] = state2
-state0.transitions["	"] = state1
-state0.transitions["a"] = state2
-state0.transitions[" "] = state1
-state0.transitions["2"] = state3
-state0.transitions["1"] = state3
-state0.transitions["\n"] = state1
-state1.transitions["\n"] = state1
-state1.transitions[" "] = state1
-state1.transitions["	"] = state1
-state1.transitions["12"] = state5
-state2.transitions["b"] = state2
-state2.transitions["a"] = state2
-state2.transitions["10"] = state5
-state3.transitions["1"] = state3
-state3.transitions["11"] = state5
-state3.transitions["2"] = state3
+	state0.transitions["b"] = state2
+	state0.transitions["	"] = state1
+	state0.transitions["a"] = state2
+	state0.transitions[" "] = state1
+	state0.transitions["2"] = state3
+	state0.transitions["1"] = state3
+	state0.transitions["\n"] = state1
+	state1.transitions["\n"] = state1
+	state1.transitions[" "] = state1
+	state1.transitions["	"] = state1
+	state1.transitions["12"] = state5
+	state2.transitions["b"] = state2
+	state2.transitions["a"] = state2
+	state2.transitions["10"] = state5
+	state3.transitions["1"] = state3
+	state3.transitions["11"] = state5
+	state3.transitions["2"] = state3
 
-return &dfa{ 
-startState: state0,
-states: []*state{ state0, state1, state2, state3, state5, }, 
-}
+	return &dfa{
+		startState: state0,
+		states:     []*state{state0, state1, state2, state3, state5},
+	}
 }
 
 // =====================
 //	Footer
 // =====================
 // Contains the exact same content defined on the Yaaalex file
-
