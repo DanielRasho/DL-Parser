@@ -16,7 +16,9 @@ func convertToSymbols(expresion []RawSymbol) ([]Symbol, error) {
 				finalSymbols = append(finalSymbols, Symbol{
 					Value:      t2.Value,
 					Precedence: 60,
-					IsOperator: false})
+					IsOperator: false,
+					Action:     Action{Priority: t2.Action.Priority},
+				})
 
 				i += 2
 				continue

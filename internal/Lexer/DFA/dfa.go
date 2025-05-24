@@ -45,7 +45,7 @@ func NewDFA(rawExpresion []postfix.RawSymbol, showLogs bool, renderDiagrams bool
 		Children:   []node{ast},
 		IsOperator: false,
 		IsFinal:    true,
-		Action:     Action{Priority: -1},
+		Action:     Action{Priority: postfix.NULL_ACTION_PRIORITY},
 	}
 
 	rootNode := node{
@@ -168,6 +168,7 @@ func positionKleenOperator(n *node, positionTable map[int]positionTableRow) (boo
 		nullable: isNullable,
 		firstPos: firstPos,
 		lastPos:  lastPos,
+		action:   Action{Priority: postfix.NULL_ACTION_PRIORITY},
 	}
 	return isNullable, firstPos, lastPos
 }
@@ -183,6 +184,7 @@ func positionOrOperator(n *node, positionTable map[int]positionTableRow) (bool, 
 		nullable: isNullable,
 		firstPos: firstPos,
 		lastPos:  lastPos,
+		action:   Action{Priority: postfix.NULL_ACTION_PRIORITY},
 	}
 	return isNullable, firstPos, lastPos
 }
@@ -212,6 +214,7 @@ func positionConcatenationOperator(n *node, positionTable map[int]positionTableR
 		nullable: isNullable,
 		firstPos: firstPos,
 		lastPos:  lastPos,
+		action:   Action{Priority: postfix.NULL_ACTION_PRIORITY},
 	}
 	return isNullable, firstPos, lastPos
 }
@@ -315,7 +318,7 @@ func getNewNodeSetForToken(items []int, token string, positionTable map[int]posi
 			continue
 		}
 		setItems = append(setItems, row.followPos...)
-		if row.action.Priority > -1 {
+		if row.action.Priority > postfix.NULL_ACTION_PRIORITY {
 			actions = append(actions, row.action)
 		}
 	}
@@ -405,10 +408,11 @@ func RemoveAbsortionStates(dfa *DFA, numFinalSymbol int) {
 
 	// Identify Absortion states
 	absStates := make([]*State, 0)
-	absStatesIndex := make([]int, 0)
 	normalStates := make([]*State, 0)
 
-	for i, state := range dfa.States {
+	// And absortion states is identified when all its transitions
+	// point to itself.
+	for _, state := range dfa.States {
 		count := 0
 		for _, nextStates := range state.Transitions {
 			if state.Id == nextStates.Id {
@@ -418,7 +422,6 @@ func RemoveAbsortionStates(dfa *DFA, numFinalSymbol int) {
 		// Interchange the count, for the number of final characters
 		if count == numFinalSymbol {
 			absStates = append(absStates, state)
-			absStatesIndex = append(absStatesIndex, i)
 			continue
 		}
 		normalStates = append(normalStates, state)
@@ -439,9 +442,8 @@ func RemoveAbsortionStates(dfa *DFA, numFinalSymbol int) {
 
 	// Remove Absortion States itself
 	newStates := dfa.States[:0]
-	for _, x := range normalStates {
-		newStates = append(newStates, x)
-	}
+	newStates = append(newStates, normalStates...)
+
 	// Garbage collect remaining States
 	clear(dfa.States[len(newStates):])
 	dfa.States = newStates

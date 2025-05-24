@@ -6,7 +6,7 @@ import (
 
 	dfa "github.com/DanielRasho/Parser/internal/Lexer/DFA"
 	balancer "github.com/DanielRasho/Parser/internal/Lexer/DFA/Balancer"
-	postfix "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
+	pf "github.com/DanielRasho/Parser/internal/Lexer/DFA/Postfix"
 	Lex_writer "github.com/DanielRasho/Parser/internal/Lexer/Generator/LexWriter"
 	yalex_reader "github.com/DanielRasho/Parser/internal/Lexer/Generator/YALexReader"
 )
@@ -21,7 +21,7 @@ func Compile(filePath, outputPath string, showLogs bool, renderDiagrams bool) er
 	}
 
 	// Join all rules in a single regex expression alongside its special symbol
-	rawExpresion := make([]postfix.RawSymbol, 0)
+	rawExpresion := make([]pf.RawSymbol, 0)
 
 	for index, rule := range yalexDefinition.Rules {
 		// For special tokens (the ones encapsulating actionable code)
@@ -37,21 +37,24 @@ func Compile(filePath, outputPath string, showLogs bool, renderDiagrams bool) er
 			return fmt.Errorf("rule %s, has an unbalanced pattern", rule.Pattern)
 		}
 
-		rawExpresion = append(rawExpresion, postfix.RawSymbol{Value: "("})
+		rawExpresion = append(rawExpresion, pf.
+			RawSymbol{Value: "(", Action: pf.Action{Priority: pf.NULL_ACTION_PRIORITY}})
 		for _, r := range rule.Pattern {
-			rawExpresion = append(rawExpresion, postfix.RawSymbol{
+			rawExpresion = append(rawExpresion, pf.RawSymbol{
 				Value:  string(r),
-				Action: postfix.Action{Priority: -1}})
+				Action: pf.Action{Priority: pf.NULL_ACTION_PRIORITY}})
 		}
-		rawExpresion = append(rawExpresion, postfix.RawSymbol{Value: ")"})
-		rawExpresion = append(rawExpresion, postfix.RawSymbol{
+		rawExpresion = append(rawExpresion,
+			pf.RawSymbol{Value: ")", Action: pf.Action{Priority: pf.NULL_ACTION_PRIORITY}})
+		rawExpresion = append(rawExpresion, pf.RawSymbol{
 			Value: strconv.Itoa(index + startIndex),
-			Action: postfix.Action{
+			Action: pf.Action{
 				Priority: index,
 				Code:     rule.Action}})
 
 		if index != len(yalexDefinition.Rules)-1 {
-			rawExpresion = append(rawExpresion, postfix.RawSymbol{Value: "|"})
+			rawExpresion = append(rawExpresion,
+				pf.RawSymbol{Value: "|", Action: pf.Action{Priority: pf.NULL_ACTION_PRIORITY}})
 		}
 
 	}

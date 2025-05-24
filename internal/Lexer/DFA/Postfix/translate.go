@@ -105,7 +105,7 @@ func interchangeOptional(expresion []Symbol) []Symbol {
 	}
 
 	formattedSymbols = append(formattedSymbols, OPERATORS[")"])
-	formattedSymbols = append(formattedSymbols, Symbol{Value: "ε", IsOperator: false, Precedence: 60})
+	formattedSymbols = append(formattedSymbols, Symbol{Value: "ε", IsOperator: false, Precedence: 60, Action: Action{Priority: -1}})
 	formattedSymbols = append(formattedSymbols, OPERATORS["|"])
 	formattedSymbols = append(formattedSymbols, OPERATORS[")"])
 	formattedSymbols = append(formattedSymbols, subExpresion...)
@@ -196,7 +196,11 @@ func interchangeClasses(expresion []Symbol) []Symbol {
 	var finalExpression []Symbol
 	finalExpression = append(finalExpression, OPERATORS[")"])
 	for i, r := range resultSlice {
-		finalExpression = append(finalExpression, Symbol{Value: string(r), IsOperator: false, Precedence: 60})
+		finalExpression = append(finalExpression,
+			Symbol{Value: string(r),
+				IsOperator: false,
+				Precedence: 60,
+				Action:     Action{Priority: -1}})
 		if i < len(resultSlice)-1 { // Avoid adding "|" at the end
 			finalExpression = append(finalExpression, OPERATORS["|"])
 		}

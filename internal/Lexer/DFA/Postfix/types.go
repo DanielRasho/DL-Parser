@@ -1,5 +1,7 @@
 package postfix
 
+const NULL_ACTION_PRIORITY int = -1
+
 type Action struct {
 	Priority int // -1 if token does not have an action
 	Code     string
@@ -36,14 +38,14 @@ const ESCAPE_SYMBOL string = "\\"
 const CONCAT_SYMBOL string = "·"
 
 var OPERATORS = map[string]Symbol{
-	")": {Value: ")", Precedence: 10, IsOperator: true, Operands: 1},
-	"(": {Value: "(", Precedence: 10, IsOperator: true, Operands: 0},
-	"]": {Value: "]", Precedence: 10, IsOperator: true, Operands: 1},
-	"[": {Value: "[", Precedence: 10, IsOperator: true, Operands: 0},
-	"|": {Value: "|", Precedence: 20, IsOperator: true, Operands: 2},
-	"·": {Value: "·", Precedence: 30, IsOperator: true, Operands: 2},
-	"?": {Value: "?", Precedence: 40, IsOperator: true, Operands: 1},
-	"*": {Value: "*", Precedence: 40, IsOperator: true, Operands: 1},
-	"+": {Value: "+", Precedence: 40, IsOperator: true, Operands: 1},
-	"^": {Value: "^", Precedence: 50, IsOperator: true, Operands: 2},
+	")": {Value: ")", Precedence: 10, IsOperator: true, Operands: 1, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"(": {Value: "(", Precedence: 10, IsOperator: true, Operands: 0, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"]": {Value: "]", Precedence: 10, IsOperator: true, Operands: 1, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"[": {Value: "[", Precedence: 10, IsOperator: true, Operands: 0, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"|": {Value: "|", Precedence: 20, IsOperator: true, Operands: 2, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"·": {Value: "·", Precedence: 30, IsOperator: true, Operands: 2, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"?": {Value: "?", Precedence: 40, IsOperator: true, Operands: 1, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"*": {Value: "*", Precedence: 40, IsOperator: true, Operands: 1, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"+": {Value: "+", Precedence: 40, IsOperator: true, Operands: 1, Action: Action{Priority: NULL_ACTION_PRIORITY}},
+	"^": {Value: "^", Precedence: 50, IsOperator: true, Operands: 2, Action: Action{Priority: NULL_ACTION_PRIORITY}},
 }
