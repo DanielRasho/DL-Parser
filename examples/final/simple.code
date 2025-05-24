@@ -1,6 +1,6 @@
-let a = 3
-let b = 2
-a + b
-a - b
-a / b
-a * b
+let a = 0;
+let b = 1;
+a + b;
+a - b;
+a / b;
+a * b;
