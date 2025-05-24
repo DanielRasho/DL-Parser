@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -16,13 +17,18 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	defer lexer.Close()
 
-	for i := 0; i < 50; i++ {
+	for {
 		token, err := lexer.GetNextToken()
 		if err != nil {
+			if err == io.EOF {
+				break
+			}
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 		fmt.Print(token.String() + "\n")
 	}
+
 }

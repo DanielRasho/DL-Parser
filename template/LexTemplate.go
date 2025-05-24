@@ -31,12 +31,19 @@ type PatternNotFound struct {
 	Pattern string
 }
 
-// Error implements the error interface for PatternNotFound
 func (e *PatternNotFound) Error() string {
 	return fmt.Sprintf("error line %d column %d \n\tpattern not found. current pattern not recognized by the language: %s",
 		e.Line,
 		e.Column,
 		e.Pattern)
+}
+
+// Error when the lexer stop cou
+type FileUnfinishedSuddenly struct {
+}
+
+func (e *FileUnfinishedSuddenly) Error() string {
+	return fmt.Sprintf("file ended before full lexeme could be recognized")
 }
 
 type Symbol = string
@@ -88,6 +95,7 @@ func (l *Lexer) GetNextToken() (Token, error) {
 	lastTokenID := NO_LEXEME
 	currentState := l.automata.startState
 	lexemeBytesSize := 0 // Lenght of current lexeme in bytes.
+	runesFromLastLexeme := 0
 
 	for {
 		// fmt.Println(currentState.id)
@@ -95,6 +103,8 @@ func (l *Lexer) GetNextToken() (Token, error) {
 		if actions := currentState.actions; len(currentState.actions) > 0 {
 			newTokenID := actions[0]() // Get action with higher priority
 			if newTokenID == SKIP_LEXEME {
+				// if action return SKIP_LEXEME ignore everything recognized
+				// until now and restart
 				currentState = l.automata.startState
 				l.bytesRead += lexemeBytesSize
 				lexemeBytesSize = 0
@@ -103,15 +113,35 @@ func (l *Lexer) GetNextToken() (Token, error) {
 			} else {
 				// If TokenID returned, update lastToken read.
 				lastTokenID = newTokenID
+				runesFromLastLexeme = 0
 			}
-		}
+		} 
+		
 		// 2. Read the next rune 
 		r, size, err := l.reader.ReadRune()
 		if err != nil {
-			// return the last recognized lexeme
-			if lastTokenID != NO_LEXEME {
+			
+			// If a lexeme has just recognized just before EOF return it
+			// Ex :  token EOF
+			//			 ^
+			if lastTokenID != NO_LEXEME && runesFromLastLexeme == 0{
 				break
 			}
+
+			// If nothing has been scanned before EOF return io.EOF error
+			// Ex :  token EOF
+			//			  ^
+			if lastTokenID == NO_LEXEME && runesFromLastLexeme == 0 {
+				return Token{}, io.EOF
+			}
+
+			// If EOF was found before concluding to read a complete token
+			// Ex :  token noEOF
+			//			    ^
+			if lastTokenID == NO_LEXEME && runesFromLastLexeme > 0 {
+				return Token{}, &FileUnfinishedSuddenly{}
+			}
+
 			// If no lexeme hast been recognized after endint the file, the file has invalid lexemes.
 			return Token{}, err
 		}
@@ -132,6 +162,7 @@ func (l *Lexer) GetNextToken() (Token, error) {
 		l.symbolBuffer.WriteRune(r)
 		lexemeBytesSize += size
 		currentState = nextState
+		runesFromLastLexeme++
 	}
 
 	// 5. Build recognized token
