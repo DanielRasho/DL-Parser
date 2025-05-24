@@ -5,12 +5,12 @@ tasks:
   compiler:run:
     desc: runs a pseudo-compiler with lexer and parser definitions
     cmds:
-      - go build -o bin/main ./cmd/LexerGenerator/LexerGenerator.go {{.CLI_ARGS}}
+      - go run ./cmd/compiler/*.go  {{.CLI_ARGS}}
 
   compiler:build:
     desc: Builds a pseudo-compiler with lexer and parser definitions
     cmds:
-      - go build -o bin/compiler ./cmd/compiler/main.go {{.CLI_ARGS}}
+      - go run ./cmd/compilerGenerator/*.go  {{.CLI_ARGS}}
 
   parser:generate:
     desc: Generates a parser.go file
