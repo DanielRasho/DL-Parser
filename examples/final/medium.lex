@@ -27,11 +27,11 @@
 
 // ====== NAMED PATTERNS =======
 {
-    digit        [0-9]
-    letter       [a-zA-Z_]
+    digit        ([0-3])
+    letter       ([a-d])
     id           {letter}({letter}|{digit})*
     number       ({digit})+
-    ws           [ \t\n\r]+
+    ws           ([ \t\n\r])+
 }
 
 // ======= RULES ========
