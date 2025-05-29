@@ -98,7 +98,7 @@ type SymbolSet = map[ParserSymbol]struct{}
 
 
 
-func CheckNonTerminal(id string, definition parser.ParserDefinition) bool {
+func CheckNonTerminal(id string, definition ParserDefinition) bool {
 	for i := 0; i < len(definition.NonTerminals); i++ {
 		if definition.NonTerminals[i].Value == id {
 			return true
@@ -109,7 +109,7 @@ func CheckNonTerminal(id string, definition parser.ParserDefinition) bool {
 
 }
 
-func CheckTerminal(id string, definition parser.ParserDefinition) bool {
+func CheckTerminal(id string, definition ParserDefinition) bool {
 	for i := 0; i < len(definition.Terminals); i++ {
 		if definition.Terminals[i].Value == id {
 			return true
@@ -195,7 +195,14 @@ func NewParser(filePath string) (*Parser, error) {
 	}, nil
 }
 
-func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotable GotoTbl, input string) {
+
+func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoTbl, token []Token) *[]Token {
+
+	input := ""
+
+	for i := 0; i < len(token); i++ {
+		input = input + " " + token[i].Value
+	}
 
 	fmt.Println(input)
 	tokens := strings.Fields(input) // ["input", "+", "input"]
@@ -307,6 +314,7 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 			case 3:
 				fmt.Println("Accepted the input")
 				accepted = false
+				return &[]Token{}
 
 			}
 
@@ -316,6 +324,7 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 			if notaccept > 3 {
 				accepted = false
 				fmt.Println("NOT ACCEPTED")
+				return &token
 			}
 			notaccept++
 
@@ -323,6 +332,6 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 
 	}
 
+	return nil
+
 }
-
-
