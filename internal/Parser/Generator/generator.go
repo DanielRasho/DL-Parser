@@ -44,6 +44,7 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	return nil
 }
 
+// USED JUST FOR DEBUGGIN PURPOSES
 func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, gotable table.GotoTbl, input string) bool {
 
 	fmt.Println(input)
