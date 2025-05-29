@@ -1,4 +1,4 @@
-package main
+package compiler
 
 import (
 	"bufio"
@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	parser "github.com/DanielRasho/Parser/internal/Parser"
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
 )
-
 
 //WE DEFINE THE FOLLOWING STRUCTURES
 
@@ -95,105 +95,6 @@ const NON_TERMINAL_ID = -1
 
 // Used for first-follow computations
 type SymbolSet = map[ParserSymbol]struct{}
-
-
-
-func CheckNonTerminal(id string, definition parser.ParserDefinition) bool {
-	for i := 0; i < len(definition.NonTerminals); i++ {
-		if definition.NonTerminals[i].Value == id {
-			return true
-		}
-	}
-
-	return false
-
-}
-
-func CheckTerminal(id string, definition parser.ParserDefinition) bool {
-	for i := 0; i < len(definition.Terminals); i++ {
-		if definition.Terminals[i].Value == id {
-			return true
-		}
-	}
-
-	return false
-
-}
-
-func newTransitTable() TransitionTbl {
-	return TransitionTbl{
-		{{- range $state, $row := .TransitTable }}
-		"{{ $state }}": TransitionTblRow{
-			{{- range $symbol, $move := $row }}
-			"{{ $symbol }}": Movement{MovementType: {{ $move.MovementType }}, NextRow: {{ $move.NextRow }}},
-			{{- end }}
-		},
-		{{- end }}
-	}
-}
-
-func newGoToTable() GotoTbl {
-	return GotoTbl{
-		{{- range $state, $row := .Gotable }}
-		"{{ $state }}": GotoTblRow{
-			{{- range $symbol, $move := $row }}
-			"{{ $symbol }}": Movement{MovementType: {{ $move.MovementType }}, NextRow: {{ $move.NextRow }}},
-			{{- end }}
-		},
-		{{- end }}
-	}
-}
-
-
-func newParserdefinition() ParserDefinition {
-	return ParserDefinition{
-		NonTerminals: []ParserSymbol{
-			{{- range .ParserDefinition.NonTerminals }}
-			{Id: {{ .Id }}, Value: "{{ .Value }}", IsTerminal: {{ .IsTerminal }}},
-			{{- end }}
-		},
-		Terminals: []ParserSymbol{
-			{{- range .ParserDefinition.Terminals }}
-			{Id: {{ .Id }}, Value: "{{ .Value }}", IsTerminal: {{ .IsTerminal }}},
-			{{- end }}
-		},
-		Productions: []ParserProduction{
-			{{- range .ParserDefinition.Productions }}
-			{Id: {{ .Id }}, Head: ParserSymbol{Id: {{ .Head.Id }}, Value: "{{ .Head.Value }}", IsTerminal: {{ .Head.IsTerminal }}},
-			 Body: []ParserSymbol{
-				{{- range .Body }}
-				{Id: {{ .Id }}, Value: "{{ .Value }}", IsTerminal: {{ .IsTerminal }}},
-				{{- end }}
-			 }},
-			{{- end }}
-		},
-	}
-}
-
-
-type Parser struct {
-	file            *os.File         // File to read from
-	reader          *bufio.Reader    // Reader to get the symbols from file
-	parsedefinition ParserDefinition // Automata for lexeme recognition
-	transitiontable TransitionTbl    //Table to parse the input where do a shift, reduce or to accept said input
-	gototable       GotoTbl          //Table that stores which transition should go
-	bytesRead       int              // Number of bytes the lexer has read
-}
-
-
-func NewParser(filePath string) (*Parser, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	return &Parser{
-		file:            file,
-		reader:          bufio.NewReader(file),
-		parsedefinition: newParserdefinition(), // Automata for lexeme recognition
-		transitiontable: newTransitTable(),     //Table to parse the input where do a shift, reduce or to accept said input
-		gototable:       newGoToTable(),        //Table that stores which transition should go
-	}, nil
-}
 
 func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotable GotoTbl, input string) {
 
@@ -325,4 +226,169 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 
 }
 
+func CheckNonTerminal(id string, definition parser.ParserDefinition) bool {
+	for i := 0; i < len(definition.NonTerminals); i++ {
+		if definition.NonTerminals[i].Value == id {
+			return true
+		}
+	}
 
+	return false
+
+}
+
+func CheckTerminal(id string, definition parser.ParserDefinition) bool {
+	for i := 0; i < len(definition.Terminals); i++ {
+		if definition.Terminals[i].Value == id {
+			return true
+		}
+	}
+
+	return false
+
+}
+
+func newTransitTable() TransitionTbl {
+	return TransitionTbl{
+		"0": TransitionTblRow{
+			"(":   Movement{MovementType: 0, NextRow: 4},
+			"int": Movement{MovementType: 0, NextRow: 3},
+		},
+		"1": TransitionTblRow{
+			"$": Movement{MovementType: 3, NextRow: -1},
+		},
+		"10": TransitionTblRow{
+			"$": Movement{MovementType: 1, NextRow: 4},
+			")": Movement{MovementType: 1, NextRow: 4},
+			"+": Movement{MovementType: 1, NextRow: 4},
+		},
+		"2": TransitionTblRow{
+			"$": Movement{MovementType: 1, NextRow: 1},
+			")": Movement{MovementType: 1, NextRow: 1},
+			"+": Movement{MovementType: 0, NextRow: 5},
+		},
+		"3": TransitionTblRow{
+			"$": Movement{MovementType: 1, NextRow: 3},
+			")": Movement{MovementType: 1, NextRow: 3},
+			"*": Movement{MovementType: 0, NextRow: 6},
+			"+": Movement{MovementType: 1, NextRow: 3},
+		},
+		"4": TransitionTblRow{
+			"(":   Movement{MovementType: 0, NextRow: 4},
+			"int": Movement{MovementType: 0, NextRow: 3},
+		},
+		"5": TransitionTblRow{
+			"(":   Movement{MovementType: 0, NextRow: 4},
+			"int": Movement{MovementType: 0, NextRow: 3},
+		},
+		"6": TransitionTblRow{
+			"(":   Movement{MovementType: 0, NextRow: 4},
+			"int": Movement{MovementType: 0, NextRow: 3},
+		},
+		"7": TransitionTblRow{
+			")": Movement{MovementType: 0, NextRow: 10},
+		},
+		"8": TransitionTblRow{
+			"$": Movement{MovementType: 1, NextRow: 0},
+			")": Movement{MovementType: 1, NextRow: 0},
+		},
+		"9": TransitionTblRow{
+			"$": Movement{MovementType: 1, NextRow: 2},
+			")": Movement{MovementType: 1, NextRow: 2},
+			"+": Movement{MovementType: 1, NextRow: 2},
+		},
+	}
+}
+
+func newGoToTable() GotoTbl {
+	return GotoTbl{
+		"0": GotoTblRow{
+			"E": Movement{MovementType: 2, NextRow: 1},
+			"T": Movement{MovementType: 2, NextRow: 2},
+		},
+		"1":  GotoTblRow{},
+		"10": GotoTblRow{},
+		"2":  GotoTblRow{},
+		"3":  GotoTblRow{},
+		"4": GotoTblRow{
+			"E": Movement{MovementType: 2, NextRow: 7},
+			"T": Movement{MovementType: 2, NextRow: 2},
+		},
+		"5": GotoTblRow{
+			"E": Movement{MovementType: 2, NextRow: 8},
+			"T": Movement{MovementType: 2, NextRow: 2},
+		},
+		"6": GotoTblRow{
+			"T": Movement{MovementType: 2, NextRow: 9},
+		},
+		"7": GotoTblRow{},
+		"8": GotoTblRow{},
+		"9": GotoTblRow{},
+	}
+}
+
+func newParserdefinition() ParserDefinition {
+	return ParserDefinition{
+		NonTerminals: []ParserSymbol{
+			{Id: -1, Value: "T", IsTerminal: false},
+			{Id: -1, Value: "E", IsTerminal: false},
+		},
+		Terminals: []ParserSymbol{
+			{Id: 0, Value: "int", IsTerminal: true},
+			{Id: 1, Value: "+", IsTerminal: true},
+			{Id: 2, Value: "*", IsTerminal: true},
+			{Id: 3, Value: "(", IsTerminal: true},
+			{Id: 4, Value: ")", IsTerminal: true},
+		},
+		Productions: []ParserProduction{
+			{Id: 1, Head: ParserSymbol{Id: -1, Value: "E", IsTerminal: false},
+				Body: []ParserSymbol{
+					{Id: -1, Value: "T", IsTerminal: false},
+					{Id: 1, Value: "+", IsTerminal: true},
+					{Id: -1, Value: "E", IsTerminal: false},
+				}},
+			{Id: 2, Head: ParserSymbol{Id: -1, Value: "E", IsTerminal: false},
+				Body: []ParserSymbol{
+					{Id: -1, Value: "T", IsTerminal: false},
+				}},
+			{Id: 3, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
+				Body: []ParserSymbol{
+					{Id: 0, Value: "int", IsTerminal: true},
+					{Id: 2, Value: "*", IsTerminal: true},
+					{Id: -1, Value: "T", IsTerminal: false},
+				}},
+			{Id: 4, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
+				Body: []ParserSymbol{
+					{Id: 0, Value: "int", IsTerminal: true},
+				}},
+			{Id: 5, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
+				Body: []ParserSymbol{
+					{Id: 3, Value: "(", IsTerminal: true},
+					{Id: -1, Value: "E", IsTerminal: false},
+					{Id: 4, Value: ")", IsTerminal: true},
+				}},
+		},
+	}
+}
+
+type Parser struct {
+	file            *os.File         // File to read from
+	reader          *bufio.Reader    // Reader to get the symbols from file
+	parsedefinition ParserDefinition // definition of the parser
+	transitiontable TransitionTbl    //Table to parse the input where do a shift, reduce or to accept said input
+	gototable       GotoTbl          //Table that stores which transition should go
+}
+
+func NewParser(filePath string) (*Parser, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return &Parser{
+		file:            file,
+		reader:          bufio.NewReader(file),
+		parsedefinition: newParserdefinition(), // Automata for lexeme recognition
+		transitiontable: newTransitTable(),     //Table to parse the input where do a shift, reduce or to accept said input
+		gototable:       newGoToTable(),        //Table that stores which transition should go
+	}, nil
+}

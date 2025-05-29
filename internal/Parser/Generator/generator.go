@@ -44,7 +44,13 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	return nil
 }
 
-func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, gotable table.GotoTbl, input string) bool {
+func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotable GotoTbl, token []Token) *[]Token {
+
+	input := ""
+
+	for i := 0; i < len(token); i++ {
+		input = input + " " + token[i].Value
+	}
 
 	fmt.Println(input)
 	tokens := strings.Fields(input) // ["input", "+", "input"]
