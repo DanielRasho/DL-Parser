@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	IO "github.com/DanielRasho/Parser/internal/IO"
 	parser "github.com/DanielRasho/Parser/internal/Parser"
 	reader "github.com/DanielRasho/Parser/internal/Parser/Generator/Reader"
+	generator "github.com/DanielRasho/Parser/internal/Parser/Generator/Writer"
 	table "github.com/DanielRasho/Parser/internal/Parser/TransitionTable"
 	"github.com/DanielRasho/Parser/internal/Parser/automata"
 	"github.com/golang-collections/collections/queue"
@@ -18,33 +18,29 @@ import (
 func Compile(filePath, outputPath string, showLogs bool) error {
 
 	// Parse Yalex file definition
-	yalexDefinition, err := reader.Parse(filePath)
+	parserDef, err := reader.Parse(filePath)
 	if err != nil {
 		return err
 	}
 
 	// runtime.Breakpoint()
-	first := table.GetFirst(yalexDefinition)
-	follow := table.GetFollow(yalexDefinition, first)
+	first := table.GetFirst(parserDef)
+	follow := table.GetFollow(parserDef, first)
 
-	auto := automata.NewAutomata(yalexDefinition, showLogs)
+	auto := automata.NewAutomata(parserDef, showLogs)
 
-	transitable, gotable, _ := table.NewTable(auto, first, follow, *yalexDefinition)
+	transitable, gotable, _ := table.NewTable(auto, first, follow, *parserDef)
 
-	filereader, err := IO.ReadFile("./examples/input.txt")
+	err = generator.WriteParserFile(filePath, outputPath, parserDef, transitable, gotable)
 	if err != nil {
 		return err
-	}
-	var input string
-	for filereader.NextLine(&input) {
-		fmt.Println(input)
-		ParseInput(*transitable, *yalexDefinition, *gotable, input)
 	}
 
 	return nil
 }
 
-func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotable GotoTbl, token []Token) *[]Token {
+// Funcion de referencia
+func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, gotable table.GotoTbl, token []Token) *[]Token {
 
 	input := ""
 
@@ -162,6 +158,7 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 			case 3:
 				fmt.Println("Accepted the input")
 				accepted = false
+				return &[]Token{}
 
 			}
 
@@ -171,13 +168,14 @@ func ParseInput(transit TransitionTbl, parserdef parser.ParserDefinition, gotabl
 			if notaccept > 3 {
 				accepted = false
 				fmt.Println("NOT ACCEPTED")
-				return false
+				return &token
 			}
 			notaccept++
 
 		}
 
 	}
-	return true
+
+	return nil
 
 }

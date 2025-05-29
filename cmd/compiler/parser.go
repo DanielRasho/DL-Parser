@@ -11,7 +11,6 @@ import (
 	"github.com/golang-collections/collections/stack"
 )
 
-
 //WE DEFINE THE FOLLOWING STRUCTURES
 
 // TRANSITIONTABLE
@@ -96,8 +95,6 @@ const NON_TERMINAL_ID = -1
 // Used for first-follow computations
 type SymbolSet = map[ParserSymbol]struct{}
 
-
-
 func CheckNonTerminal(id string, definition ParserDefinition) bool {
 	for i := 0; i < len(definition.NonTerminals); i++ {
 		if definition.NonTerminals[i].Value == id {
@@ -123,7 +120,7 @@ func CheckTerminal(id string, definition ParserDefinition) bool {
 func newTransitTable() TransitionTbl {
 	return TransitionTbl{
 		"0": TransitionTblRow{
-			"(": Movement{MovementType: 0, NextRow: 4},
+			"(":   Movement{MovementType: 0, NextRow: 4},
 			"int": Movement{MovementType: 0, NextRow: 3},
 		},
 		"1": TransitionTblRow{
@@ -146,15 +143,15 @@ func newTransitTable() TransitionTbl {
 			"+": Movement{MovementType: 1, NextRow: 3},
 		},
 		"4": TransitionTblRow{
-			"(": Movement{MovementType: 0, NextRow: 4},
+			"(":   Movement{MovementType: 0, NextRow: 4},
 			"int": Movement{MovementType: 0, NextRow: 3},
 		},
 		"5": TransitionTblRow{
-			"(": Movement{MovementType: 0, NextRow: 4},
+			"(":   Movement{MovementType: 0, NextRow: 4},
 			"int": Movement{MovementType: 0, NextRow: 3},
 		},
 		"6": TransitionTblRow{
-			"(": Movement{MovementType: 0, NextRow: 4},
+			"(":   Movement{MovementType: 0, NextRow: 4},
 			"int": Movement{MovementType: 0, NextRow: 3},
 		},
 		"7": TransitionTblRow{
@@ -178,14 +175,10 @@ func newGoToTable() GotoTbl {
 			"E": Movement{MovementType: 2, NextRow: 1},
 			"T": Movement{MovementType: 2, NextRow: 2},
 		},
-		"1": GotoTblRow{
-		},
-		"10": GotoTblRow{
-		},
-		"2": GotoTblRow{
-		},
-		"3": GotoTblRow{
-		},
+		"1":  GotoTblRow{},
+		"10": GotoTblRow{},
+		"2":  GotoTblRow{},
+		"3":  GotoTblRow{},
 		"4": GotoTblRow{
 			"E": Movement{MovementType: 2, NextRow: 7},
 			"T": Movement{MovementType: 2, NextRow: 2},
@@ -197,15 +190,11 @@ func newGoToTable() GotoTbl {
 		"6": GotoTblRow{
 			"T": Movement{MovementType: 2, NextRow: 9},
 		},
-		"7": GotoTblRow{
-		},
-		"8": GotoTblRow{
-		},
-		"9": GotoTblRow{
-		},
+		"7": GotoTblRow{},
+		"8": GotoTblRow{},
+		"9": GotoTblRow{},
 	}
 }
-
 
 func newParserdefinition() ParserDefinition {
 	return ParserDefinition{
@@ -222,35 +211,34 @@ func newParserdefinition() ParserDefinition {
 		},
 		Productions: []ParserProduction{
 			{Id: 1, Head: ParserSymbol{Id: -1, Value: "E", IsTerminal: false},
-			 Body: []ParserSymbol{
-				{Id: -1, Value: "T", IsTerminal: false},
-				{Id: 1, Value: "+", IsTerminal: true},
-				{Id: -1, Value: "E", IsTerminal: false},
-			 }},
+				Body: []ParserSymbol{
+					{Id: -1, Value: "T", IsTerminal: false},
+					{Id: 1, Value: "+", IsTerminal: true},
+					{Id: -1, Value: "E", IsTerminal: false},
+				}},
 			{Id: 2, Head: ParserSymbol{Id: -1, Value: "E", IsTerminal: false},
-			 Body: []ParserSymbol{
-				{Id: -1, Value: "T", IsTerminal: false},
-			 }},
+				Body: []ParserSymbol{
+					{Id: -1, Value: "T", IsTerminal: false},
+				}},
 			{Id: 3, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
-			 Body: []ParserSymbol{
-				{Id: 0, Value: "int", IsTerminal: true},
-				{Id: 2, Value: "*", IsTerminal: true},
-				{Id: -1, Value: "T", IsTerminal: false},
-			 }},
+				Body: []ParserSymbol{
+					{Id: 0, Value: "int", IsTerminal: true},
+					{Id: 2, Value: "*", IsTerminal: true},
+					{Id: -1, Value: "T", IsTerminal: false},
+				}},
 			{Id: 4, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
-			 Body: []ParserSymbol{
-				{Id: 0, Value: "int", IsTerminal: true},
-			 }},
+				Body: []ParserSymbol{
+					{Id: 0, Value: "int", IsTerminal: true},
+				}},
 			{Id: 5, Head: ParserSymbol{Id: -1, Value: "T", IsTerminal: false},
-			 Body: []ParserSymbol{
-				{Id: 3, Value: "(", IsTerminal: true},
-				{Id: -1, Value: "E", IsTerminal: false},
-				{Id: 4, Value: ")", IsTerminal: true},
-			 }},
+				Body: []ParserSymbol{
+					{Id: 3, Value: "(", IsTerminal: true},
+					{Id: -1, Value: "E", IsTerminal: false},
+					{Id: 4, Value: ")", IsTerminal: true},
+				}},
 		},
 	}
 }
-
 
 type Parser struct {
 	file            *os.File         // File to read from
@@ -260,7 +248,6 @@ type Parser struct {
 	gototable       GotoTbl          //Table that stores which transition should go
 	bytesRead       int              // Number of bytes the lexer has read
 }
-
 
 func NewParser(filePath string) (*Parser, error) {
 	file, err := os.Open(filePath)
@@ -275,7 +262,6 @@ func NewParser(filePath string) (*Parser, error) {
 		gototable:       newGoToTable(),        //Table that stores which transition should go
 	}, nil
 }
-
 
 func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoTbl, token []Token) *[]Token {
 
