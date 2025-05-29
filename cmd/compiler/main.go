@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 package compiler
 
 import (
 	"fmt"
 	"io"
+=======
+package main
+
+import (
+	"fmt"
+>>>>>>> 9ca2b225d9d60e8d8330e554f31cb9e5b77fb218
 	"os"
 )
 
@@ -19,6 +26,7 @@ func main() {
 	}
 	defer lexer.Close()
 
+<<<<<<< HEAD
 	for {
 		token, err := lexer.GetNextToken()
 		if err != nil {
@@ -31,4 +39,6 @@ func main() {
 		fmt.Print(token.String() + "\n")
 	}
 
+=======
+>>>>>>> 9ca2b225d9d60e8d8330e554f31cb9e5b77fb218
 }

@@ -22,7 +22,7 @@ func main() {
 
 	// Check if both flags are provided, if not print usage
 	if *yalexFile == "" || *yaparFile == "" || *outputFlag == "" {
-		fmt.Println("Usage: task lex:generate -- -f <input-file> -o <output-file>")
+		fmt.Println("Usage: task compiler:generate -- -l <yalex-file> -p <yapar-file> -d <output-dir>")
 		os.Exit(1)
 	}
 

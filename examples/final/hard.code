@@ -1,0 +1,32 @@
+// Variable declarations
+var x = 42;
+var y = 3.14;
+var name = "compiler";
+var isReady = true;
+
+// Arithmetic operations
+x = x + y * 2;
+y = (x - y) / 3;
+
+// Conditional block
+if (x > 10 && isReady) {
+    x = x - 1;
+    name = "updated";
+} else {
+    x = 0;
+}
+
+// Loop structure
+while (x < 100) {
+    x = x + 10;
+    y = y + 1.5;
+    if (x == 50) {
+        break;
+    }
+}
+
+// Simulated function block
+func compute() {
+    var result = x + y;
+    return result;
+}

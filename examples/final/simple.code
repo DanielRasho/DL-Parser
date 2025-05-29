@@ -3,4 +3,4 @@ let b = 1;
 a + b;
 a - b;
 a / b;
-a * b;
+a *b;

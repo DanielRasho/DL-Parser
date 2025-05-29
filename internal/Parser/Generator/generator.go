@@ -39,6 +39,7 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 	return nil
 }
 
+<<<<<<< HEAD
 // Funcion de referencia
 func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, gotable table.GotoTbl, token []Token) *[]Token {
 
@@ -47,6 +48,10 @@ func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, 
 	for i := 0; i < len(token); i++ {
 		input = input + " " + token[i].Value
 	}
+=======
+// USED JUST FOR DEBUGGIN PURPOSES
+func ParseInput(transit table.TransitionTbl, parserdef parser.ParserDefinition, gotable table.GotoTbl, input string) bool {
+>>>>>>> 9ca2b225d9d60e8d8330e554f31cb9e5b77fb218
 
 	fmt.Println(input)
 	tokens := strings.Fields(input) // ["input", "+", "input"]
