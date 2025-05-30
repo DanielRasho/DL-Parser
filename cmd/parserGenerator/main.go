@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	generator "github.com/DanielRasho/Parser/internal/Parser/Generator"
+	parser "github.com/DanielRasho/Parser/internal/Parser/Generator"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	fmt.Printf("Render diagramas: %t\n", *diagramFlag)
 
 	// CODE FOR GENERATING LPARSER ...
-	err := generator.Compile(*fileFlag, *outputFlag, true)
+	err := parser.Compile(*fileFlag, *outputFlag, true)
 	if err != nil {
 		fmt.Println(err)
 	}
