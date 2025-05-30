@@ -288,102 +288,102 @@ type action func() int
 
 // createDFA constructs the DFA that recognizes the user language.
 func createDFA() *dfa {
-	state6 := &state{id: "6" , 
+	state2 := &state{id: "2" , 
 actions: []action{ 
  func() int { return ID 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
-state8 := &state{id: "8" , transitions: make(map[Symbol]*state), isFinal: false}
-state2 := &state{id: "2" , 
-actions: []action{ 
- func() int { return PLUS 
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
-state7 := &state{id: "7" , 
+state3 := &state{id: "3" , 
 actions: []action{ 
  func() int { return NUMBER 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
-state14 := &state{id: "14" , 
+state0 := &state{id: "0" , transitions: make(map[Symbol]*state), isFinal: false}
+state4 := &state{id: "4" , 
 actions: []action{ 
- func() int { return LET 
+ func() int {
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
-state0 := &state{id: "0" , transitions: make(map[Symbol]*state), isFinal: false}
-state10 := &state{id: "10" , 
+state7 := &state{id: "7" , 
+actions: []action{ 
+ func() int { return ASSIGN 
+return SKIP_LEXEME } , 
+}, transitions: make(map[Symbol]*state), isFinal: false}
+state5 := &state{id: "5" , transitions: make(map[Symbol]*state), isFinal: false}
+state8 := &state{id: "8" , 
 actions: []action{ 
  func() int { return MULT 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
 state11 := &state{id: "11" , 
 actions: []action{ 
- func() int { return SEMICOLON 
+ func() int { return DIV 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
 state12 := &state{id: "12" , transitions: make(map[Symbol]*state), isFinal: true}
-state3 := &state{id: "3" , 
+state14 := &state{id: "14" , 
+actions: []action{ 
+ func() int { return LET 
+return SKIP_LEXEME } , 
+}, transitions: make(map[Symbol]*state), isFinal: false}
+state6 := &state{id: "6" , 
 actions: []action{ 
  func() int { return MINUS 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
-state4 := &state{id: "4" , 
-actions: []action{ 
- func() int { return DIV 
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
-state5 := &state{id: "5" , 
-actions: []action{ 
- func() int {
-return SKIP_LEXEME } , 
-}, transitions: make(map[Symbol]*state), isFinal: false}
 state9 := &state{id: "9" , 
 actions: []action{ 
- func() int { return ASSIGN 
+ func() int { return SEMICOLON 
+return SKIP_LEXEME } , 
+}, transitions: make(map[Symbol]*state), isFinal: false}
+state10 := &state{id: "10" , 
+actions: []action{ 
+ func() int { return PLUS 
 return SKIP_LEXEME } , 
 }, transitions: make(map[Symbol]*state), isFinal: false}
 state13 := &state{id: "13" , transitions: make(map[Symbol]*state), isFinal: false}
 
-state6.transitions["2"] = state6
-state6.transitions["b"] = state6
-state6.transitions["c"] = state6
-state6.transitions["a"] = state6
-state6.transitions["0"] = state6
-state6.transitions["17"] = state12
-state6.transitions["1"] = state6
-state8.transitions["e"] = state13
-state2.transitions["12"] = state12
-state7.transitions["2"] = state7
-state7.transitions["18"] = state12
-state7.transitions["1"] = state7
-state7.transitions["0"] = state7
+state2.transitions["0"] = state2
+state2.transitions["c"] = state2
+state2.transitions["2"] = state2
+state2.transitions["1"] = state2
+state2.transitions["17"] = state12
+state2.transitions["b"] = state2
+state2.transitions["a"] = state2
+state3.transitions["1"] = state3
+state3.transitions["2"] = state3
+state3.transitions["0"] = state3
+state3.transitions["18"] = state12
+state0.transitions["2"] = state3
+state0.transitions["-"] = state6
+state0.transitions["c"] = state2
+state0.transitions["	"] = state4
+state0.transitions[" "] = state4
+state0.transitions["a"] = state2
+state0.transitions["\r"] = state4
+state0.transitions["+"] = state10
+state0.transitions["l"] = state5
+state0.transitions["="] = state7
+state0.transitions[";"] = state9
+state0.transitions["0"] = state3
+state0.transitions["\n"] = state4
+state0.transitions["1"] = state3
+state0.transitions["/"] = state11
+state0.transitions["*"] = state8
+state0.transitions["b"] = state2
+state4.transitions["	"] = state4
+state4.transitions[" "] = state4
+state4.transitions["19"] = state12
+state4.transitions["\r"] = state4
+state4.transitions["\n"] = state4
+state7.transitions["11"] = state12
+state5.transitions["e"] = state13
+state8.transitions["14"] = state12
+state11.transitions["15"] = state12
 state14.transitions["10"] = state12
-state0.transitions["*"] = state10
-state0.transitions["\r"] = state5
-state0.transitions["0"] = state7
-state0.transitions["c"] = state6
-state0.transitions["	"] = state5
-state0.transitions["/"] = state4
-state0.transitions["\n"] = state5
-state0.transitions["b"] = state6
-state0.transitions["+"] = state2
-state0.transitions["2"] = state7
-state0.transitions[";"] = state11
-state0.transitions[" "] = state5
-state0.transitions["l"] = state8
-state0.transitions["="] = state9
-state0.transitions["1"] = state7
-state0.transitions["-"] = state3
-state0.transitions["a"] = state6
-state10.transitions["14"] = state12
-state11.transitions["16"] = state12
-state3.transitions["13"] = state12
-state4.transitions["15"] = state12
-state5.transitions[" "] = state5
-state5.transitions["\r"] = state5
-state5.transitions["\n"] = state5
-state5.transitions["19"] = state12
-state5.transitions["	"] = state5
-state9.transitions["11"] = state12
+state6.transitions["13"] = state12
+state9.transitions["16"] = state12
+state10.transitions["12"] = state12
 state13.transitions["t"] = state14
 
 return &dfa{ 
