@@ -1,5 +1,7 @@
 bin/
 diagram/*.png
 diagrams/*.png
-cmd/*/lexer.go
-cmd/*/parser.go
+cmd/compiler/lexer.go
+cmd/compiler/parser.go
+cmd/lexer/lexer.go
+cmd/parser/parser.go
