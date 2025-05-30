@@ -19,7 +19,7 @@ func WriteParserFile(templateFilePath string, outputFilePath string, parserdef *
 
 	// Load and parse the template
 	fmt.Println("PRINTING")
-	tmpl, err := template.ParseFiles(templateFilePath)
+	tmpl, err := template.ParseFiles("./template/ParserTemplate.go")
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}

@@ -16,13 +16,14 @@ func main() {
 	yaparFile := flag.String("p", "", "Parser file path")
 	outputFlag := flag.String("d", "", "Output file path")
 	verbose := flag.Bool("verbose", true, "Render automata diagrams")
+	template := flag.String("t", "", "template file path")
 
 	// Parse the command line flags
 	flag.Parse()
 
 	// Check if both flags are provided, if not print usage
-	if *yalexFile == "" || *yaparFile == "" || *outputFlag == "" {
-		fmt.Println("Usage: task compiler:generate -- -l <yalex-file> -p <yapar-file> -d <output-dir>")
+	if *yalexFile == "" || *yaparFile == "" || *outputFlag == "" || *template == "" {
+		fmt.Println("Usage: task compiler:generate -- -l <yalex-file> -p <yapar-file> -d <output-dir> -t <template-file>")
 		os.Exit(1)
 	}
 
@@ -31,6 +32,7 @@ func main() {
 	fmt.Printf("Yapar file: %s\n", *yaparFile)
 	fmt.Printf("Output folder: %s\n", *outputFlag)
 	fmt.Printf("Verbose: %t\n", *verbose)
+	fmt.Printf("Template: %s\n", *template)
 
 	lexerFile := filepath.Join(*outputFlag, "lexer.go")
 	parserFile := filepath.Join(*outputFlag, "parser.go")
@@ -42,7 +44,7 @@ func main() {
 	}
 
 	// CODE FOR GENERATING PARSER ...
-	err = parser.Compile(*yaparFile, parserFile, *verbose)
+	err = parser.Compile(*yaparFile, *template, parserFile, *verbose)
 	if err != nil {
 		fmt.Println(err)
 	}

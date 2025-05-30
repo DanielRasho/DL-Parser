@@ -12,14 +12,15 @@ func main() {
 	// Define the flags
 	fileFlag := flag.String("f", "", "Yalex file path")
 	outputFlag := flag.String("o", "", "Output file path")
+	template := flag.String("t", "", "Template Parser")
 	diagramFlag := flag.Bool("diagram", true, "Render automata diagrams")
 
 	// Parse the command line flags
 	flag.Parse()
 
 	// Check if both flags are provided, if not print usage
-	if *fileFlag == "" || *outputFlag == "" {
-		fmt.Println("Usage: task lex:generate -- -f <input-file> -o <output-file>")
+	if *fileFlag == "" || *outputFlag == "" || *template == "" {
+		fmt.Println("Usage: task lex:generate -- -f <input-file> -o <output-file> -t <template-parser>")
 		os.Exit(1)
 	}
 
@@ -29,7 +30,7 @@ func main() {
 	fmt.Printf("Render diagramas: %t\n", *diagramFlag)
 
 	// CODE FOR GENERATING LPARSER ...
-	err := parser.Compile(*fileFlag, *outputFlag, true)
+	err := parser.Compile(*fileFlag, *template, *outputFlag, true)
 	if err != nil {
 		fmt.Println(err)
 	}

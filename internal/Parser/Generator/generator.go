@@ -15,10 +15,10 @@ import (
 )
 
 // Given a file to read and a output path, writes a parser definition to the desired path.
-func Compile(filePath, outputPath string, showLogs bool) error {
+func Compile(filePathparser, filepathtemplate, outputPath string, showLogs bool) error {
 
 	// Parse Yalex file definition
-	parserDef, err := reader.Parse(filePath)
+	parserDef, err := reader.Parse(filePathparser)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func Compile(filePath, outputPath string, showLogs bool) error {
 
 	transitable, gotable, _ := table.NewTable(auto, first, follow, *parserDef)
 
-	err = generator.WriteParserFile(filePath, outputPath, parserDef, transitable, gotable)
+	err = generator.WriteParserFile(filepathtemplate, outputPath, parserDef, transitable, gotable)
 	if err != nil {
 		return err
 	}
