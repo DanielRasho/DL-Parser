@@ -15,6 +15,20 @@
         SEMICOLON
         WS
     )
+
+    var tokenNames = []string{
+    "LET",
+    "ASSIGN",
+    "PLUS",
+    "MINUS",
+    "MULT",
+    "DIV",
+    "ID",
+    "NUMBER",
+    "SEMICOLON",
+    "WS",
+    }
+
 %}
 
 // ====== NAMED PATTERNS =======

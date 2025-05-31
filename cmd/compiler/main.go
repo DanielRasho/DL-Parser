@@ -19,6 +19,13 @@ func main() {
 	}
 	defer lexer.Close()
 
+	parser, err := NewParser(os.Args[1])
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer parser.Close()
+
+	slicetokens := []Token{}
 	for {
 		token, err := lexer.GetNextToken()
 		if err != nil {
@@ -28,6 +35,10 @@ func main() {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
+
+		slicetokens = append(slicetokens, token)
+		ParseInput(parser.transitiontable, parser.parsedefinition, parser.gototable, slicetokens, tokenNames)
+
 		fmt.Print(token.String() + "\n")
 	}
 

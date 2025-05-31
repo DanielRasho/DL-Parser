@@ -195,13 +195,16 @@ func NewParser(filePath string) (*Parser, error) {
 	}, nil
 }
 
+func (p *Parser) Close() {
+	p.file.Close()
+}
 
-func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoTbl, token []Token) *[]Token {
+func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoTbl, token []Token, tokenNames []string) *[]Token {
 
 	input := ""
 
 	for i := 0; i < len(token); i++ {
-		input = input + " " + token[i].Value
+		input = input + " " + tokenNames[token[i].TokenID]
 	}
 
 	fmt.Println(input)
