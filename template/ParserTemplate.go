@@ -135,11 +135,7 @@ func NewParser(filePath string) (*Parser, error) {
 	}, nil
 }
 
-func (p *Parser) Close() {
-	p.file.Close()
-}
-
-func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoTbl, token []Token, tokenNames []string) *[]Token {
+func (p *Parser) ParseInput(token []Token, tokenNames []string) *[]Token {
 
 	input := ""
 
@@ -175,12 +171,12 @@ func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoT
 		lasval := queval
 
 		//Si es terminal o algo asi osea que no sea int, (, + ) y que el segundo sea terminal, utilizamos la tabla de transition
-		if !CheckNonTerminal(estackval, parserdef) && CheckTerminal(queval, parserdef) {
-			fmt.Println(transit[estackval][queval].MovementType)
-			switch transit[estackval][queval].MovementType {
+		if !CheckNonTerminal(estackval, *p.parsedefinition) && CheckTerminal(queval, *p.parsedefinition) {
+			fmt.Println((*p.transitiontable)[estackval][queval].MovementType)
+			switch (*p.transitiontable)[estackval][queval].MovementType {
 			case 0:
 				fmt.Println("printing shift")
-				topush := strconv.Itoa(transit[estackval][queval].NextRow)
+				topush := strconv.Itoa((*p.transitiontable)[estackval][queval].NextRow)
 				fmt.Println(topush)
 				estack.Push(q.Dequeue())
 				estack.Push(topush)
@@ -192,13 +188,13 @@ func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoT
 			case 1:
 				fmt.Println("printing REDUCE")
 				var reduced = true
-				for i := 0; i < len(parserdef.Productions[transit[estackval][queval].NextRow].Body); i++ {
+				for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
 					for reduced {
 
-						if parserdef.Productions[transit[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
+						if (p.parsedefinition).Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
 							reduced = false
 							estack.Pop()
-							estack.Push(parserdef.Productions[transit[estackval][queval].NextRow].Head.Value)
+							estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
 							estackval = estack.Peek().(string)
 							queval = q.Peek().(string)
 						} else {
@@ -212,17 +208,17 @@ func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoT
 			}
 
 		}
-		if CheckNonTerminal(estackval, parserdef) {
+		if CheckNonTerminal(estackval, *p.parsedefinition) {
 
 			lastval := estack.Peek().(string)
 			estack.Pop()
 			firstval := estack.Peek().(string)
 
-			switch gotable[firstval][lastval].MovementType {
+			switch (*p.gototable)[firstval][lastval].MovementType {
 			case 2:
 				fmt.Println("printing GOTO")
 				estack.Push(lastval)
-				topush := strconv.Itoa(gotable[firstval][lastval].NextRow)
+				topush := strconv.Itoa((*p.gototable)[firstval][lastval].NextRow)
 				estack.Push(topush)
 				queval = q.Peek().(string)
 				estackval = estack.Peek().(string)
@@ -230,20 +226,20 @@ func ParseInput(transit TransitionTbl, parserdef ParserDefinition, gotable GotoT
 			}
 
 		}
-		if !CheckNonTerminal(queval, parserdef) && !CheckTerminal(queval, parserdef) {
+		if !CheckNonTerminal(queval, *p.parsedefinition) && !CheckTerminal(queval, *p.parsedefinition) {
 			fmt.Println("ADDING TO STACK")
 			fmt.Println(estackval, queval)
-			fmt.Println(transit[estackval][queval].MovementType)
-			switch transit[estackval][queval].MovementType {
+			fmt.Println((*p.transitiontable)[estackval][queval].MovementType)
+			switch (*p.transitiontable)[estackval][queval].MovementType {
 			case 1:
 				var reduced = true
-				for i := 0; i < len(parserdef.Productions[transit[estackval][queval].NextRow].Body); i++ {
+				for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
 					for reduced {
 
-						if parserdef.Productions[transit[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
+						if p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
 							reduced = false
 							estack.Pop()
-							estack.Push(parserdef.Productions[transit[estackval][queval].NextRow].Head.Value)
+							estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
 							estackval = estack.Peek().(string)
 							queval = q.Peek().(string)
 						} else {

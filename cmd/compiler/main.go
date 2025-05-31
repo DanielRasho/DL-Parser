@@ -23,7 +23,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	defer parser.Close()
 
 	slicetokens := []Token{}
 	for {
@@ -37,7 +36,7 @@ func main() {
 		}
 
 		slicetokens = append(slicetokens, token)
-		ParseInput(parser.transitiontable, parser.parsedefinition, parser.gototable, slicetokens, tokenNames)
+		parser.ParseInput(slicetokens, tokenNames)
 
 		fmt.Print(token.String() + "\n")
 	}
