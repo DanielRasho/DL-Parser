@@ -8,6 +8,8 @@
 %token *
 %token (
 %token )
+IGNORE WS
+
 /*FINALIZA Sección de TOKENS */
 
 %% /* Delimitador para saber que son tokens y producciones */

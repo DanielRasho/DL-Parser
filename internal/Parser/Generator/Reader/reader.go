@@ -16,9 +16,12 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 	var Productions *Parser.ParserProduction = new(Parser.ParserProduction)
 	var arrProductions []Parser.ParserProduction
 	var nonterminals []Parser.ParserSymbol
+	ignoredTokens := make(map[int]Parser.ParserSymbol)
 	var is_product = false
 	var head string
 	var err error
+
+	tokensReaded := 0
 
 	filereader, _ := io.ReadFile(filePath)
 	for filereader.NextLine(&line) {
@@ -29,9 +32,17 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 			token = strings.Split(token[1], " ")
 			for i := 1; i < len(token); i++ {
 				token[i] = strings.TrimSpace(token[i])
-				Tokens = append(Tokens, Parser.ParserSymbol{Id: len(Tokens), Value: token[i], IsTerminal: true})
+				Tokens = append(Tokens, Parser.ParserSymbol{Id: tokensReaded, Value: token[i], IsTerminal: true})
+				tokensReaded++
 			}
-
+		} else if strings.Contains(line, "IGNORE") && !is_product {
+			token = strings.Split(line, "IGNORE")
+			token = strings.Split(token[1], " ")
+			for i := 1; i < len(token); i++ {
+				token[i] = strings.TrimSpace(token[i])
+				ignoredTokens[tokensReaded] = Parser.ParserSymbol{Id: tokensReaded, Value: token[i], IsTerminal: true}
+				tokensReaded++
+			}
 		}
 
 		//Una vez terminado de leer los tokens terminales empezamos a leer las producciones
@@ -56,6 +67,7 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 						}
 
 						token = strings.Split(line, " ")
+						nonTerminalIndexCounter := -1
 
 						for i := range len(token) {
 							index_val := findIndex(Tokens, token[i])
@@ -63,8 +75,9 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 								index_valnon := findIndex(nonterminals, token[i])
 								if index_valnon == -1 {
-									nonterminals = append(nonterminals, Parser.ParserSymbol{Id: -1, Value: token[i]})
+									nonterminals = append(nonterminals, Parser.ParserSymbol{Id: nonTerminalIndexCounter, Value: token[i]})
 									index_valnon = findIndex(nonterminals, token[i])
+									nonTerminalIndexCounter--
 								}
 								Productions.Body = append(Productions.Body, nonterminals[index_valnon])
 								Productions.Id = len(arrProductions) + 1
@@ -109,9 +122,10 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 	}
 
 	return &Parser.ParserDefinition{
-		NonTerminals: nonterminals,
-		Terminals:    Tokens,
-		Productions:  arrProductions,
+		NonTerminals:  nonterminals,
+		Terminals:     Tokens,
+		Productions:   arrProductions,
+		IgnoredSymbol: ignoredTokens,
 	}, err
 }
 

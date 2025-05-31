@@ -3,6 +3,7 @@ package writer
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"text/template"
 
 	parser "github.com/DanielRasho/Parser/internal/Parser"
@@ -19,7 +20,10 @@ func WriteParserFile(templateFilePath string, outputFilePath string, parserdef *
 
 	// Load and parse the template
 	fmt.Println("PRINTING")
-	tmpl, err := template.ParseFiles("./template/ParserTemplate.go")
+	tmpl, err := template.New("ParserTemplate").Funcs(template.FuncMap{
+		"goLiteral": goLiteral,
+	}).ParseFiles("./template/ParserTemplate.go")
+
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -39,10 +43,19 @@ func WriteParserFile(templateFilePath string, outputFilePath string, parserdef *
 	defer outFile.Close()
 
 	// Execute the template
-	err = tmpl.Execute(outFile, data)
+	// err = tmpl.Execute(outFile, data)
+	err = tmpl.ExecuteTemplate(outFile, "ParserTemplate", data)
 	if err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
 
 	return nil
+}
+
+func goLiteral(v any) string {
+	raw := fmt.Sprintf("%#v", v)
+
+	// Remove package prefix like "parser.ParserSymbol" -> "ParserSymbol"
+	re := regexp.MustCompile(`\b\w+\.(ParserSymbol)\b`)
+	return re.ReplaceAllString(raw, `$1`)
 }
