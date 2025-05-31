@@ -31,6 +31,10 @@ func Compile(filePathparser, filepathtemplate, outputPath string, showLogs bool)
 
 	transitable, gotable, _ := table.NewTable(auto, first, follow, *parserDef)
 
+	table.PrintMovementTable("TRANSITION TABLE", *transitable)
+
+	table.PrintMovementTable("GOTO TABLE", *gotable)
+
 	err = generator.WriteParserFile(filepathtemplate, outputPath, parserDef, transitable, gotable)
 	if err != nil {
 		return err
