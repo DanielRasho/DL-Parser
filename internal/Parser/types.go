@@ -7,9 +7,10 @@ import (
 
 // Its a programatically representation of a yapar file.
 type ParserDefinition struct {
-	NonTerminals []ParserSymbol
-	Terminals    []ParserSymbol
-	Productions  []ParserProduction
+	NonTerminals  []ParserSymbol
+	Terminals     []ParserSymbol
+	Productions   []ParserProduction
+	IgnoredSymbol map[int]ParserSymbol
 }
 
 // Represents a single production declaration
