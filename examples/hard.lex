@@ -59,7 +59,7 @@
     number       ({digit})+
     float_lit    ({digit})+.({digit})+
     string_lit   "{id}"
-    ws           ([ \t\n\r])+
+    WS           ([ \t\n\r])+
 }
 
 // ======= RULES ========
@@ -110,7 +110,7 @@
 {number}        { return NUMBER }
 {string_lit}    { return STRING_LIT }
 {id}            { return ID }
-{ws}            {} 
+{WS}            { return WS } 
 %%
 
 // ======= FOOTER =======

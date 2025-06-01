@@ -36,9 +36,23 @@ func main() {
 		}
 
 		slicetokens = append(slicetokens, token)
-		parser.ParseInput(slicetokens, tokenNames)
+		if token.Value == "\n" {
+			slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals)
+		}
 
 		fmt.Print(token.String() + "\n")
+
+	}
+
+	if len(slicetokens) >= 0 {
+		slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals)
+	}
+
+	if len(slicetokens) == 0 {
+		fmt.Println("ALL LINES ARE ACCEPTED")
+	} else {
+		fmt.Printf("\nERROR PARSING FROM %d, to %d", slicetokens[0].Offset, slicetokens[len(slicetokens)-1].Offset)
+		fmt.Println(slicetokens)
 	}
 
 }

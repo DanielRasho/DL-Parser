@@ -31,7 +31,7 @@
     letter       ([a-d])
     id           {letter}({letter}|{digit})*
     number       ({digit})+
-    ws           ([ \t\n\r])+
+    WS           ([ \t\n\r])+
 }
 
 // ======= RULES ========
@@ -57,7 +57,7 @@
 
 {id}            { return ID }
 {number}        { return NUMBER }
-{ws}            {} 
+{WS}            { return WS } 
 %%
 
 // ======= FOOTER =======

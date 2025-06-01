@@ -135,15 +135,18 @@ func NewParser(filePath string) (*Parser, error) {
 	}, nil
 }
 
-func (p *Parser) ParseInput(token []Token, tokenNames []string) *[]Token {
+
+func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol) *[]Token {
 
 	input := ""
 
 	for i := 0; i < len(token); i++ {
-		input = input + " " + tokenNames[token[i].TokenID]
+		if token[i].TokenID <= len(parserterminals)-1 {
+			input = input + " " + parserterminals[token[i].TokenID].Value
+		}
+
 	}
 
-	fmt.Println(input)
 	tokens := strings.Fields(input) // ["input", "+", "input"]
 
 	q := queue.New()
@@ -162,48 +165,52 @@ func (p *Parser) ParseInput(token []Token, tokenNames []string) *[]Token {
 
 	// #Empezamos a parsear
 	var accepted = true
-	var notaccept = 0
+	fmt.Println(input)
+	var staticCount = 0
+	var lastEstackVal = ""
+	var lastQueueVal = ""
+
 	for accepted {
 
-		fmt.Println(estackval, queval)
-
-		onceval := estackval
-		lasval := queval
 
 		//Si es terminal o algo asi osea que no sea int, (, + ) y que el segundo sea terminal, utilizamos la tabla de transition
 		if !CheckNonTerminal(estackval, *p.parsedefinition) && CheckTerminal(queval, *p.parsedefinition) {
-			fmt.Println((*p.transitiontable)[estackval][queval].MovementType)
 			switch (*p.transitiontable)[estackval][queval].MovementType {
 			case 0:
-				fmt.Println("printing shift")
-				topush := strconv.Itoa((*p.transitiontable)[estackval][queval].NextRow)
-				fmt.Println(topush)
-				estack.Push(q.Dequeue())
-				estack.Push(topush)
-				estackval = estack.Peek().(string)
-				queval = q.Peek().(string)
-
-				fmt.Println(estackval, queval)
+				_, ok := (*p.transitiontable)[estackval][queval]
+				if !ok {
+					return &token
+				} else {
+					topush := strconv.Itoa((*p.transitiontable)[estackval][queval].NextRow)
+					estack.Push(q.Dequeue())
+					estack.Push(topush)
+					estackval = estack.Peek().(string)
+					queval = q.Peek().(string)
+				}
 
 			case 1:
-				fmt.Println("printing REDUCE")
+
 				var reduced = true
-				for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
-					for reduced {
+				_, ok := (*p.transitiontable)[estackval][queval]
+				if !ok {
+					return &token
+				} else {
+					for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
+						for reduced {
+							if (p.parsedefinition).Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
+								reduced = false
+								estack.Pop()
+								estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
+								estackval = estack.Peek().(string)
+								queval = q.Peek().(string)
+							} else {
+								estack.Pop()
+							}
 
-						if (p.parsedefinition).Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
-							reduced = false
-							estack.Pop()
-							estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
-							estackval = estack.Peek().(string)
-							queval = q.Peek().(string)
-						} else {
-							estack.Pop()
 						}
-
 					}
+
 				}
-				fmt.Println(estackval, queval)
 
 			}
 
@@ -216,64 +223,82 @@ func (p *Parser) ParseInput(token []Token, tokenNames []string) *[]Token {
 
 			switch (*p.gototable)[firstval][lastval].MovementType {
 			case 2:
-				fmt.Println("printing GOTO")
-				estack.Push(lastval)
-				topush := strconv.Itoa((*p.gototable)[firstval][lastval].NextRow)
-				estack.Push(topush)
-				queval = q.Peek().(string)
-				estackval = estack.Peek().(string)
-				fmt.Println(estackval, queval)
+				_, ok := (*p.gototable)[firstval][lastval]
+				if !ok {
+					return &token
+				} else {
+					estack.Push(lastval)
+					topush := strconv.Itoa((*p.gototable)[firstval][lastval].NextRow)
+					estack.Push(topush)
+					queval = q.Peek().(string)
+					estackval = estack.Peek().(string)
+				}
 			}
 
 		}
 		if !CheckNonTerminal(queval, *p.parsedefinition) && !CheckTerminal(queval, *p.parsedefinition) {
-			fmt.Println("ADDING TO STACK")
-			fmt.Println(estackval, queval)
-			fmt.Println((*p.transitiontable)[estackval][queval].MovementType)
 			switch (*p.transitiontable)[estackval][queval].MovementType {
 			case 1:
-				var reduced = true
-				for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
-					for reduced {
 
-						if p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
-							reduced = false
-							estack.Pop()
-							estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
-							estackval = estack.Peek().(string)
-							queval = q.Peek().(string)
-						} else {
-							estack.Pop()
+				_, ok := (*p.transitiontable)[estackval][queval] //IF IT DOEsNT FIND THE VALUE FROM THE MAP
+				if !ok {
+					return &token
+				} else {
+					var reduced = true
+					for i := 0; i < len(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body); i++ {
+						for reduced {
+
+							if p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Body[i].Value == estack.Peek().(string) {
+								reduced = false
+								estack.Pop()
+								estack.Push(p.parsedefinition.Productions[(*p.transitiontable)[estackval][queval].NextRow].Head.Value)
+								estackval = estack.Peek().(string)
+								queval = q.Peek().(string)
+							} else {
+								estack.Pop()
+							}
+
 						}
-
 					}
 				}
-				fmt.Println(estackval, queval)
 
 			case 3:
-				fmt.Println("Accepted the input")
+				fmt.Println("INPUT ACCEPTED")
 				accepted = false
+				value := ""
+				for i := 0; i < len(token); i++ {
+					value = value + " " + token[i].Value
+				}
+				fmt.Printf("\nInput  Code Line: %s        Tokens Line: %s \n", value, input)
+				for i := 0; i < estack.Len(); i++ {
+					p := estack.Pop().(string)
+					value = value + " " + p
+				}
 				return &[]Token{}
 
 			}
 
 		}
-
-		if lasval == queval && onceval == estackval {
-			if notaccept > 3 {
-				accepted = false
-				fmt.Println("NOT ACCEPTED")
+		staticCount++
+		if lastEstackVal == estackval && lastQueueVal == queval {
+			if staticCount > 3 {
+				fmt.Println("Parser got stuck in an infinite loop.")
 				return &token
 			}
-			notaccept++
-
+		} else {
+			staticCount = 0
 		}
+		lastEstackVal = estackval
+		lastQueueVal = queval
+
+
 
 	}
 
 	return nil
 
 }
+
 
 func newTransitTable() *TransitionTbl {
 	return &TransitionTbl{

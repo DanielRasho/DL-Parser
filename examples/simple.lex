@@ -16,18 +16,7 @@
         WS
     )
 
-    var tokenNames = []string{
-    "LET",
-    "ASSIGN",
-    "PLUS",
-    "MINUS",
-    "MULT",
-    "DIV",
-    "ID",
-    "NUMBER",
-    "SEMICOLON",
-    "WS",
-    }
+
 
 %}
 
@@ -37,7 +26,7 @@
     letter       [a-c]
     id           {letter}({letter}|{digit})*
     number       ({digit})+
-    ws           ([ \t\n\r])+
+    WS           ([ \t\n\r])+
 }
 
 // ======= RULES ========
@@ -52,7 +41,7 @@
 
 {id}            { return ID }
 {number}        { return NUMBER }
-{ws}            {} 
+{WS}            { return WS } 
 %%
 
 // ======= FOOTER =======
