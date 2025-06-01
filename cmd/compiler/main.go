@@ -35,17 +35,21 @@ func main() {
 			os.Exit(1)
 		}
 
-		slicetokens = append(slicetokens, token)
-		if token.Value == "\n" {
-			slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals)
+		_, ok := parser.parsedefinition.IgnoredSymbols[token.TokenID]
+
+		if !ok {
+			slicetokens = append(slicetokens, token)
+			fmt.Print(token.String() + "\n")
 		}
 
-		fmt.Print(token.String() + "\n")
+		if token.Value == "\n" {
+			slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals, *parser.parsedefinition)
+		}
 
 	}
 
 	if len(slicetokens) >= 0 {
-		slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals)
+		slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals, *parser.parsedefinition)
 	}
 
 	if len(slicetokens) == 0 {

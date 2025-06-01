@@ -136,18 +136,21 @@ func NewParser(filePath string) (*Parser, error) {
 }
 
 
-func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol) *[]Token {
+
+func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parserdef ParserDefinition) *[]Token {
 
 	input := ""
+	var tokens []string
 
 	for i := 0; i < len(token); i++ {
 		if token[i].TokenID <= len(parserterminals)-1 {
-			input = input + " " + parserterminals[token[i].TokenID].Value
+			if token[i].Value != parserdef.IgnoredSymbols[token[i].TokenID].Value {
+				tokens = append(tokens, parserterminals[token[i].TokenID].Value)
+			}
 		}
 
 	}
 
-	tokens := strings.Fields(input) // ["input", "+", "input"]
 
 	q := queue.New()
 
