@@ -19,6 +19,7 @@ program:
 statement:
     var_decl
   | if_stmt
+  | assignment
   | while_stmt
   | expression
   | block
@@ -48,7 +49,14 @@ statement_list:
 expression:
     expression PLUS term
   | expression MINUS term
+  | expression GT term
+  | expression LT term
+  | expression EQ term
   | term
+;
+
+assignment:
+    ID ASSIGN expression
 ;
 
 term:
