@@ -52,24 +52,11 @@ func Test_check1(t *testing.T) {
 
 func Test_check2(t *testing.T) {
 
-	parserdef, _ := reader.Parse("../../../examples/productions.y")
+	parserdef, _ := reader.Parse("../../../examples/medium.par")
 	first := GetFirst(parserdef)
 	follow := GetFollow(parserdef, first)
-	var automa = automata.NewAutomata(parserdef, false)
 
-	TransitionTabl, gotable, _ := NewTable(automa, first, follow, *parserdef)
-
-	fmt.Println("TABLA DE TRANSICION")
-	fmt.Println(TransitionTabl)
-	fmt.Println("GOTO")
-	fmt.Println(gotable)
-
-	for state, transitions := range *TransitionTabl {
-		fmt.Printf("State %s:\n", state)
-		for symbol, action := range transitions {
-			fmt.Printf("  %s => {%d %d}\n", symbol, action.MovementType, action.NextRow)
-		}
-	}
+	fmt.Println(follow)
 
 }
 

@@ -39,7 +39,6 @@ func main() {
 
 		if !ok {
 			slicetokens = append(slicetokens, token)
-			fmt.Print(token.String() + "\n")
 		}
 
 		if token.Value == "\n" {

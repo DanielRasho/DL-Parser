@@ -51,12 +51,14 @@ func NewTable(a *automata.Automata, first map[string]parser.SymbolSet, follow ma
 
 			} else {
 
+				toshift = *GetOneProductionWithNoTransitions(a.States[i])
 				// fmt.Println(Parserdefinition.Productions[Getindexprodcutions(toshift, Parserdefinition)])
 				fset := follow[Parserdefinition.Productions[Getindexprodcutions(toshift, Parserdefinition)].Head.Value]
 				for sym := range fset {
 					idnumber := strconv.Itoa(a.States[i].Id)
 					value := Getindexprodcutions(toshift, Parserdefinition)
 					transit[idnumber][sym.Value] = Movement{MovementType: 1, NextRow: value}
+
 				}
 
 			}
@@ -235,4 +237,23 @@ func equalBodies(a, b []parser.ParserSymbol) bool {
 		}
 	}
 	return true
+}
+
+func GetOneProductionWithNoTransitions(state *automata.State) *parser.ParserProduction {
+	for _, prod := range state.Productions {
+		hasAnyTransition := false
+
+		for _, sym := range prod.Body {
+			if _, ok := state.Transitions[sym]; ok {
+				hasAnyTransition = true
+				break
+			}
+		}
+
+		if !hasAnyTransition {
+			prodCopy := prod // avoid returning reference to loop variable
+			return &prodCopy
+		}
+	}
+	return nil
 }
