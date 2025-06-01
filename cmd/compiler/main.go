@@ -35,15 +35,22 @@ func main() {
 			os.Exit(1)
 		}
 
-		if token.TokenID == 17 && len(slicetokens) > 0 {
-			// Process the line on newline
-			slicetokens = *parser.ParseInput(slicetokens, parser.parsedefinition.Terminals, *parser.parsedefinition)
-			continue
-		}
+		_, ok := parser.parsedefinition.IgnoredSymbols[token.TokenID]
 
-		if _, ok := parser.parsedefinition.IgnoredSymbols[token.TokenID]; !ok {
+		if !ok {
 			slicetokens = append(slicetokens, token)
 		}
+
+		if token.Value == "\n" {
+			result := parser.ParseInput(slicetokens, parser.parsedefinition.Terminals, *parser.parsedefinition)
+
+			if len(*result) == 0 {
+				slicetokens = []Token{}
+			} else {
+				slicetokens = *result // retry only unparsed
+			}
+		}
+
 	}
 
 	if len(slicetokens) >= 0 {
