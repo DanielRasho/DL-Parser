@@ -1,8 +1,10 @@
 let a = 3
 let b = 2
+
 if a > 2 {
     a + b
 }
+
 while b  < 10 {
     b = b - 1
 }
