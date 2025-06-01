@@ -75,7 +75,7 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 
 								index_valnon := findIndex(nonterminals, token[i])
 								if index_valnon == -1 {
-									nonterminals = append(nonterminals, Parser.ParserSymbol{Id: nonTerminalIndexCounter, Value: token[i]})
+									nonterminals = append(nonterminals, Parser.ParserSymbol{Id: -1, Value: token[i]})
 									index_valnon = findIndex(nonterminals, token[i])
 									nonTerminalIndexCounter--
 								}
