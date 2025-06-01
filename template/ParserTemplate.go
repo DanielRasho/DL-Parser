@@ -135,11 +135,8 @@ func NewParser(filePath string) (*Parser, error) {
 	}, nil
 }
 
-
-
 func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parserdef ParserDefinition) *[]Token {
 
-	input := ""
 	var tokens []string
 
 	for i := 0; i < len(token); i++ {
@@ -150,7 +147,6 @@ func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parse
 		}
 
 	}
-
 
 	q := queue.New()
 
@@ -168,13 +164,11 @@ func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parse
 
 	// #Empezamos a parsear
 	var accepted = true
-	fmt.Println(input)
 	var staticCount = 0
 	var lastEstackVal = ""
 	var lastQueueVal = ""
 
 	for accepted {
-
 
 		//Si es terminal o algo asi osea que no sea int, (, + ) y que el segundo sea terminal, utilizamos la tabla de transition
 		if !CheckNonTerminal(estackval, *p.parsedefinition) && CheckTerminal(queval, *p.parsedefinition) {
@@ -266,13 +260,14 @@ func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parse
 				}
 
 			case 3:
-				fmt.Println("INPUT ACCEPTED")
 				accepted = false
 				value := ""
+				input := ""
 				for i := 0; i < len(token); i++ {
 					value = value + " " + token[i].Value
+					input = input + " " + parserterminals[token[i].TokenID].Value
 				}
-				fmt.Printf("\nInput  Code Line: %s        Tokens Line: %s \n", value, input)
+				fmt.Printf("\nINPUT ACCEPTED\nInput  Code Line: %s        Tokens Line: %s \n", value, input)
 				for i := 0; i < estack.Len(); i++ {
 					p := estack.Pop().(string)
 					value = value + " " + p
@@ -285,7 +280,6 @@ func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parse
 		staticCount++
 		if lastEstackVal == estackval && lastQueueVal == queval {
 			if staticCount > 3 {
-				fmt.Println("Parser got stuck in an infinite loop.")
 				return &token
 			}
 		} else {
@@ -294,14 +288,11 @@ func (p *Parser) ParseInput(token []Token, parserterminals []ParserSymbol, parse
 		lastEstackVal = estackval
 		lastQueueVal = queval
 
-
-
 	}
 
 	return nil
 
 }
-
 
 func newTransitTable() *TransitionTbl {
 	return &TransitionTbl{
