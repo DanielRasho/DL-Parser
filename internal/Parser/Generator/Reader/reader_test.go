@@ -7,17 +7,15 @@ import (
 
 func Test_check1(t *testing.T) {
 
-	el, _ := Parse("../../../../examples/productions2.y")
+	el, _ := Parse("../../../../examples/medium.par")
 
-	fmt.Println(el.Terminals)
 	fmt.Println(el.NonTerminals)
-	fmt.Println(el.Productions)
 
 }
 
 func Test_check2(t *testing.T) {
 
-	el, _ := Parse("../../../../examples/exampleprod.y")
+	el, _ := Parse("../../../../examples/simple.par")
 
 	fmt.Println(el.Terminals)
 	fmt.Println(el.NonTerminals)

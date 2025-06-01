@@ -10,7 +10,7 @@ import (
 
 func Test_check2(t *testing.T) {
 
-	parserDef, err := reader.Parse("../../../../examples/productions2.y")
+	parserDef, err := reader.Parse("../../../../examples/medium.par")
 	if err != nil {
 	}
 

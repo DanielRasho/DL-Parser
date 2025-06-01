@@ -120,6 +120,13 @@ func Parse(filePath string) (*Parser.ParserDefinition, error) {
 			nonterminals = append(nonterminals, Tokens[i])
 		}
 	}
+	for i := 0; i < len(arrProductions); i++ {
+		if !AlreadyinList(nonterminals, arrProductions[i].Head) {
+			nonterminals = append(nonterminals, arrProductions[i].Head)
+
+		}
+
+	}
 
 	return &Parser.ParserDefinition{
 		NonTerminals:  nonterminals,
@@ -137,4 +144,16 @@ func findIndex(tokens []Parser.ParserSymbol, target string) int {
 		}
 	}
 	return -1 // not found
+}
+
+// FINDS THE INDEX VALUE OF THE ARRAY OF PARSE SYMBOLS
+func AlreadyinList(nonterminals []Parser.ParserSymbol, target Parser.ParserSymbol) bool {
+
+	for i := 0; i < len(nonterminals); i++ {
+		if nonterminals[i].Id == target.Id && nonterminals[i].IsTerminal == target.IsTerminal && nonterminals[i].Value == target.Value {
+			return true
+		}
+	}
+	return false
+
 }
