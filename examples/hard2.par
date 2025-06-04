@@ -1,0 +1,107 @@
+/* ========== PARSER DEFINITION BASED ON YOUR LEXER ========== */
+
+/* INICIA Sección de TOKENS */
+%token IF ELSE WHILE RETURN FUNC VAR INT FLOAT STRING BOOL TRUE FALSE FOR BREAK CONTINUE
+%token ASSIGN PLUS MINUS MULT DIV MOD AND OR NOT EQ NEQ LT GT LTE GTE
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMICOLON DOT
+%token ID NUMBER FLOAT_LIT STRING_LIT
+
+IGNORE WS
+IGNORE COMMENT
+
+/* FINALIZA Sección de TOKENS */
+
+%%
+
+/* INICIA Sección de PRODUCCIONES */
+
+program:
+    program statement
+  | statement
+;
+
+statement:
+    var_decl SEMICOLON
+  | assignment SEMICOLON
+  | if_stmt
+  | while_stmt
+  | func_decl
+  | return_stmt SEMICOLON
+  | expression SEMICOLON
+  | block
+;
+
+var_decl:
+    VAR ID ASSIGN expression
+  | VAR ID
+;
+
+assignment:
+    ID ASSIGN expression
+;
+
+if_stmt:
+    IF LPAREN expression RPAREN block
+  | IF LPAREN expression RPAREN block ELSE block
+;
+
+while_stmt:
+    WHILE LPAREN expression RPAREN block
+;
+
+func_decl:
+    FUNC ID LPAREN param_list RPAREN block
+  | FUNC ID LPAREN RPAREN block
+;
+
+param_list:
+    param_list COMMA ID
+  | ID
+;
+
+return_stmt:
+    RETURN expression
+;
+
+block:
+    LBRACE statement_list RBRACE
+;
+
+statement_list:
+    statement_list statement
+  | statement
+;
+
+expression:
+    expression PLUS term
+  | expression MINUS term
+  | expression AND term
+  | expression OR term
+  | expression EQ term
+  | expression NEQ term
+  | expression LT term
+  | expression LTE term
+  | expression GT term
+  | expression GTE term
+  | term
+;
+
+term:
+    term MULT factor
+  | term DIV factor
+  | term MOD factor
+  | factor
+;
+
+factor:
+    LPAREN expression RPAREN
+  | NOT factor
+  | ID
+  | NUMBER
+  | FLOAT_LIT
+  | STRING_LIT
+  | TRUE
+  | FALSE
+;
+
+/* FINALIZA Sección de PRODUCCIONES */

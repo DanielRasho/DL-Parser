@@ -1,0 +1,19 @@
+func compute() {
+    var result = x + y;
+    return result;
+}
+func fibonacci(n) {
+    var a = 0;
+    var b = 1;
+    var temp;
+
+    while (n > 0) {
+        temp = a + b;
+        a = b;
+        b = temp;
+        n = n - 1;
+    }
+
+    return a;
+}
+var result = fibonacci();

@@ -81,6 +81,9 @@ func CreateLexTemplateComponentes(yal *yalexDef.YALexDefinition, adf *dfa.DFA) L
 			if strings.Compare(symbol, "\r") == 0 {
 				transymbol = "\\r"
 			}
+			if strings.Compare(symbol, "\\") == 0 {
+				transymbol = "\\"
+			}
 			transitions = transitions + "state" + adf.States[i].Id + ".transitions[\"" + transymbol + "\"] = state" + adf.States[i].Transitions[symbol].Id + "\n"
 		}
 
